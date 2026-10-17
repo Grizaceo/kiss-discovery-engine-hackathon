@@ -68,7 +68,7 @@ uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-
    - **Read-only audit (`runs/audit-20261017T215138-6151e4/summary.json`):** **34/34 owned sandboxes verified `destroyed` (`unresolved: []`)**; 20,350 provider-reported tokens across 16 usage events.
 
 4. **Local screenshots (secret-free)**
-   - Saved under `runs/captures-20261017/` (ignored by Git):
+   - Saved under `runs/captures-20261017/` (ignored by Git) and copied to the tracked `evidence/captures-20261017/`:
      - `dashboard-completed.png` — ledger view with `search-20261017T215022-01459f` and historical runs.
      - `dashboard-live-running.png` — live in-progress state captured during `search-20261017T215022-01459f`.
      - `report-search-20261017T215022-01459f.png` — standalone evidence report showing task contract, dual lineage, timings and code.

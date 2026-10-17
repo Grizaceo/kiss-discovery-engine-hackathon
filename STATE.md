@@ -36,7 +36,7 @@ Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459
   3. **GitHub Pages activation** serving static `evidence/index.html` as `Deployed Project URL`.
   4. **Submission to `https://projects.dev/leaderboard` and the official Google Form** (requires 6-digit email OTP at submission time; real close **Sat 2026-10-17 17:30 PT = 21:30 Chile**).
 
-Last verified: 2026-10-17T20:16-03:00 (pre-publish Block A: ruff format/check clean, 91 offline tests passed). Block 7 / K16 & K17 (commit `910d594`, 2026-10-17T19:49:53-03:00): `Sandboxes.cleanup()` performs a read-only inventory pass to adopt any unrecorded boxes belonging to the current run (`name == run_name` or `forked_from in owned`) and enforces a total cleanup time budget (`budget_seconds=360`), marking remaining boxes `cleanup_pending`; all Blocks 0–7 complete with 90 offline tests passed.
+Last verified: 2026-10-17T20:14-03:00 (pre-publish Block A: ruff format/check clean, 91 offline tests passed). Block 7 / K16 & K17 (commit `910d594`, 2026-10-17T19:49:53-03:00): `Sandboxes.cleanup()` performs a read-only inventory pass to adopt any unrecorded boxes belonging to the current run (`name == run_name` or `forked_from in owned`) and enforces a total cleanup time budget (`budget_seconds=360`), marking remaining boxes `cleanup_pending`; all Blocks 0–7 complete with 90 offline tests passed.
 
 ## Session consolidation (2026-10-17)
 - User-requested handoff saved in `docs/SESSION_HANDOFF_2026-10-17.md` (local handoff, not published): read-only review, subsequent agent fixes, prioritized technical follow-up, submission requirements, demo ideas and form answers. No implementation edits, tests, provider calls or external actions in this consolidation.
@@ -49,3 +49,8 @@ Last verified: 2026-10-17T20:16-03:00 (pre-publish Block A: ruff format/check cl
 - `docs/DEMO.md`: real deadline (17:30 PT = 21:30 Chile; demos 18:00 PT = 22:00 Chile on Discord), official Google Form with the five mandatory requirements, 2–3 min on-camera video note, owner `Grizaceo` in the leaderboard table.
 - `README.md`: `## Tech stack` (from `pyproject.toml`, `uv.lock`, `docs/PROVENANCE.md`) and public evidence URL `https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/`.
 - `pyproject.toml` `Repository` URL set; empty `.nojekyll` added for GitHub Pages; internal handoff excluded via local `.git/info/exclude`.
+
+## Consistency and hygiene pass (Block B, 2026-10-17 ~20:15 Chile)
+- Figures re-derived read-only from `runs/` and `evidence/` summaries and matched across README, `docs/VERIFICATION.md`, `docs/DEMO.md`, `STATE.md`, `evidence/index.html`: 34/34 destroyed, 20,350 tokens (11,271 + 9,079, 16 usage events), ratios 0.973×/1.349×/0.892× (`215022`) and 0.832× (`200300`). Fixed: test count 90 → 91 in `docs/VERIFICATION.md`; README "7 real runs" → the 11 runs listed in the audit's `owner_runs`; DEMO screenshot location.
+- Hygiene scan (counts only): 5 secret values loaded in-process from `.env` + `MERCURY_ENV_FILE`; 0 occurrences in tracked files, 0 in `git log --all -p`, 0 in commit messages. Patterns: `sk-` 1 tracked (false positive `task-contract`), `Bearer`/`acct_…16`/`PRIVATE KEY` 0, emails only `example.com` placeholders and binary/`@pytest` false positives, `/home/` 0 tracked but 4 in history (local path in `8901471`, removed by `44e8322`; no key values; history not rewritten, as instructed).
+- `.env`, `.projects/`, `runs/`, `dist/`, `.venv/`, caches ignored (`git check-ignore -v`); handoff excluded via `.git/info/exclude`.

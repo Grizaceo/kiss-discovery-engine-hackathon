@@ -8,7 +8,7 @@
 
 - **Problem:** Given `count_pairs(a: list[int], b: list[int], lower: int, upper: int) -> int`, count cross-list index pairs `(i, j)` with `lower <= a[i] + b[j] <= upper` (inclusive) across up to `10^6` integers in `±10^9` using only the Python 3 standard library and without mutating caller inputs.
 - **What KISS does:** Queries **Mercury 2.5** (Inception direct API) for distinct algorithms (`sorted-bisect`, `two-pointer`), validates the AST contract on the host without ever importing or executing candidate code locally, forks a paused **CreateOS Sandbox** microVM for each attempt, runs 60 hidden correctness tests plus 3×20,000-item benchmarks under a root-owned supervisor (`nobody` worker), pauses the winner, and forks the next revision directly from the winner's paused VM and measured feedback.
-- **Verified result:** Across 7 real runs (`34/34` owned CreateOS microVMs verified `destroyed`, `20,350` provider-reported tokens), `search-20261017T215022-01459f` completed a full 2-approach + own-parent revision chain (`60/60` on all 3 candidates, `4/4` VMs destroyed), and `search-20261017T200300-4a7d42` produced the only candidate faster than baseline beyond the 5% measurement noise band (`0.83× baseline`, root cross-check `agreement: true`).
+- **Verified result:** Across the 11 real runs covered by the read-only audit (`34/34` owned CreateOS microVMs verified `destroyed`, `20,350` provider-reported tokens), `search-20261017T215022-01459f` completed a full 2-approach + own-parent revision chain (`60/60` on all 3 candidates, `4/4` VMs destroyed), and `search-20261017T200300-4a7d42` produced the only candidate faster than baseline beyond the 5% measurement noise band (`0.83× baseline`, root cross-check `agreement: true`).
 
 ## How it works
 
