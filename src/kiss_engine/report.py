@@ -30,9 +30,17 @@ def _selection_text(c, summary):
     if summary.get("status") == "running":
         return "pending selection (experiment round in progress)"
     best = summary.get("best_candidate_id")
+    rev_parent = summary.get("revision_parent_id")
     cid = c.get("candidate_id")
     if best and cid == best:
         return "selected as best candidate (correctness first, then fastest median)"
+    if rev_parent and cid == rev_parent:
+        return "selected as revision parent only (no passing candidate in run)"
+    if c.get("selected_in_rounds"):
+        return (
+            f"selected in round(s) {c['selected_in_rounds']} and used as parent; "
+            f"superseded by {rev_parent or best or 'later candidate'}"
+        )
     f = c.get("feedback") or {}
     passed = f.get("tests_passed", "—")
     total = f.get("total", 60)
@@ -86,6 +94,13 @@ def render_report(summary):
     resources = summary.get("resources") or []
     destroyed = sum(1 for r in resources if r.get("status") == "destroyed")
     benchmark_n = (summary.get("config") or {}).get("benchmark_n", 20000)
+    best_id = summary.get("best_candidate_id")
+    rev_parent_id = summary.get("revision_parent_id")
+    rev_parent_row = (
+        f"<dt>Revision parent</dt><dd><b>{h(rev_parent_id)}</b> (highest-ranked evaluable candidate used for revision; not a passing winner)</dd>"
+        if rev_parent_id and rev_parent_id != best_id
+        else ""
+    )
 
     cards = []
     for c in summary.get("candidates", []):
@@ -154,7 +169,7 @@ def render_report(summary):
 <style>:root{{color-scheme:dark}}body{{font:15px/1.55 system-ui;background:#0e1117;color:#e6edf3;max-width:1120px;margin:36px auto;padding:0 24px}}h1{{font-size:34px;margin-bottom:4px}}h2{{margin-top:0}}.subtitle,dt{{color:#9eacbb}}header p{{font-size:13px;color:#9eacbb}}article,.panel{{background:#151b23;border:1px solid #303b49;border-radius:14px;padding:22px;margin:18px 0}}.best-card{{border-color:#2ea043}}dl{{display:grid;grid-template-columns:230px 1fr;gap:9px}}dd{{margin:0;overflow-wrap:anywhere}}pre{{background:#0c1119;padding:16px;overflow:auto;font:12px/1.6 monospace;max-height:600px;border-radius:8px}}.badge{{font-size:12px;background:#333e50;padding:4px 9px;border-radius:12px;display:inline-block}}.correct,.performance_met,.winner{{background:#114932;color:#a0f0be}}.live{{background:#5a3e0b;color:#ffd885}}.err{{color:#ffac9c}}summary{{cursor:pointer;padding:8px 0;font-weight:600}}a{{color:#79c0ff}}.cols{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}@media(max-width:760px){{.cols,dl{{grid-template-columns:1fr}}}}</style>
 <p><a href="/">← Back to local experiment ledger</a></p>
 <h1>KISS Discovery Engine</h1><p class="subtitle">Evidence, not confidence. Mercury 2.5 · Inception direct · real CreateOS microVM forks.</p>
-<section class="panel"><p><span class="badge {"live" if is_live else ""}">{h(state_label)}</span></p><h2>{h(summary["run_id"])}</h2><dl><dt>Run status &amp; stop reason</dt><dd><b>{h(status)}</b> · {h(stop_display)}</dd><dt>Selected winner (best)</dt><dd><b>{h(summary.get("best_candidate_id") or "none")}</b> (rule: 60/60 correctness first, then tests_passed, then lowest supervisor-measured median ms)</dd><dt>Started / finished (UTC)</dt><dd>{h(summary.get("started_at") or "—")} → {h(summary.get("finished_at") or ("running" if is_live else "—"))}</dd><dt>Mercury 2.5 HTTP calls</dt><dd>{h(summary.get("model_calls", "—"))}</dd><dt>Owned CreateOS microVMs</dt><dd>{h(destroyed)}/{h(len(resources))} verified destroyed</dd></dl><p class="err">{h(summary.get("error", ""))}</p><p class="err">{h(" · ".join(summary.get("warnings", [])))}</p><p class="subtitle">Timing methodology and caveats are recorded per candidate. Subtraction of IPC/data-generation overhead is noisy: <code>performance_met</code> is a finite-run threshold, not a portable speedup proof.</p></section>
+<section class="panel"><p><span class="badge {"live" if is_live else ""}">{h(state_label)}</span></p><h2>{h(summary["run_id"])}</h2><dl><dt>Run status &amp; stop reason</dt><dd><b>{h(status)}</b> · {h(stop_display)}</dd><dt>Best correct candidate</dt><dd><b>{h(best_id or "none")}</b> (rule: 60/60 correctness first, then tests_passed, then lowest supervisor-measured median ms)</dd>{rev_parent_row}<dt>Started / finished (UTC)</dt><dd>{h(summary.get("started_at") or "—")} → {h(summary.get("finished_at") or ("running" if is_live else "—"))}</dd><dt>Mercury 2.5 HTTP calls</dt><dd>{h(summary.get("model_calls", "—"))}</dd><dt>Owned CreateOS microVMs</dt><dd>{h(destroyed)}/{h(len(resources))} verified destroyed</dd></dl><p class="err">{h(summary.get("error", ""))}</p><p class="err">{h(" · ".join(summary.get("warnings", [])))}</p><p class="subtitle">Timing methodology and caveats are recorded per candidate. Subtraction of IPC/data-generation overhead is noisy: <code>performance_met</code> is a finite-run threshold, not a portable speedup proof.</p></section>
 <section class="panel"><h2>Task contract · count_pairs (T1b)</h2><p><code>count_pairs(a: list[int], b: list[int], lower: int, upper: int) -&gt; int</code> — count cross-list index pairs <code>(i, j)</code> such that <code>lower &lt;= a[i] + b[j] &lt;= upper</code> (inclusive). Duplicates count by index; empty lists or <code>lower &gt; upper</code> return <code>0</code>; caller inputs must not be mutated; Python 3 standard library only; <code>|a[i]|, |b[j]| &lt;= 10^9</code>, <code>|lower|, |upper| &lt;= 2×10^9</code>, up to <code>10^6</code> elements. Evaluated remotely as unprivileged <code>nobody</code> worker under a root-owned supervisor across 60 correctness tests and 3 seeded datasets of <code>N={h(benchmark_n)}</code> items per list.</p></section>
 <section class="panel"><h2>Lineage: Logical code ancestry vs. Physical microVM forks</h2><div class="cols"><div><h3>1. Logical solution lineage (code &amp; feedback)</h3><ul>{code_tree}</ul><p class="subtitle">Generation 1+ receives only its own logical parent's code and measured feedback.</p></div><div><h3>2. Physical microVM lineage (CreateOS pause → fork)</h3><ul>{vm_tree}</ul><p class="subtitle">Gen 0 forks from the paused base VM; Gen 1+ physically forks from its logical parent's paused VM.</p></div></div></section>
 {"".join(cards)}<section class="panel"><h2>Resource cleanup</h2><pre>{h(json.dumps(resources, indent=2))}</pre></section>

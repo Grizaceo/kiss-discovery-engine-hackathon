@@ -374,23 +374,47 @@ def test_invalid_structured_model_content_has_bounded_retry(tmp_path):
     m.close()
 
 
-@pytest.mark.parametrize(
-    ("override", "expected"),
-    [
-        ({"max_candidates": 1}, "max_candidates"),
-        ({"max_candidates": 2}, "max_candidates"),
-        ({"max_model_calls": 1}, "max_model_calls"),
-        ({"max_sandboxes": 2}, "max_sandboxes"),
-    ],
-)
-def test_search_stops_at_each_configured_cap_offline(
-    tmp_path, monkeypatch, override, expected
-):
+def make_verdict(status="correct", tests_passed=60, candidate_ms=2.0, baseline_ms=1.0):
+    verdict = {
+        "protocol_version": 1,
+        "status": status,
+        "tests_passed": tests_passed,
+        "total": 60,
+        "compile_ok": status != "compilation_error",
+        "errors": [],
+        "candidate_ms": candidate_ms
+        if status in {"correct", "performance_met"}
+        else None,
+        "baseline_ms": baseline_ms
+        if status in {"correct", "performance_met"}
+        else None,
+        "benchmark": {
+            "candidate_count": 3,
+            "baseline_count": 3,
+            "expected_count": 3,
+            "n": 1000,
+            "reps": 3,
+            "warmup": 1,
+        }
+        if status in {"correct", "performance_met"}
+        else None,
+    }
+    exit_code = (
+        0
+        if status in {"correct", "performance_met"}
+        else 2
+        if status == "harness_error"
+        else 10
+    )
+    return exit_code, verdict
+
+
+def install_offline_search_fakes(monkeypatch, verdicts=None):
     from types import SimpleNamespace
 
     from kiss_engine import engine
 
-    monkeypatch.chdir(tmp_path)
+    queue = list(verdicts or [])
     monkeypatch.setattr(
         engine, "load_secrets", lambda: {"createos": "FAKE", "mercury": "FAKE"}
     )
@@ -422,26 +446,9 @@ def test_search_stops_at_each_configured_cap_offline(
             pass
 
         def exec(self, *args, **kwargs):
-            verdict = {
-                "protocol_version": 1,
-                "status": "correct",
-                "tests_passed": 60,
-                "total": 60,
-                "compile_ok": True,
-                "errors": [],
-                "candidate_ms": 2,
-                "baseline_ms": 1,
-                "benchmark": {
-                    "candidate_count": 3,
-                    "baseline_count": 3,
-                    "expected_count": 3,
-                    "n": 1000,
-                    "reps": 3,
-                    "warmup": 1,
-                },
-            }
+            exit_code, verdict = queue.pop(0) if queue else make_verdict()
             return {
-                "exit_code": 0,
+                "exit_code": exit_code,
                 "standard_output": json.dumps(verdict),
                 "standard_error": "",
             }
@@ -472,6 +479,23 @@ def test_search_stops_at_each_configured_cap_offline(
     monkeypatch.setattr(engine, "Mercury", FakeMercury)
     monkeypatch.setattr(engine, "checked", lambda *args, **kwargs: "OFFLINE_FIXTURE")
     monkeypatch.setattr(engine, "projection", lambda box: {"forked_from": box.parent})
+    return engine
+
+
+@pytest.mark.parametrize(
+    ("override", "expected"),
+    [
+        ({"max_candidates": 1}, "max_candidates"),
+        ({"max_candidates": 2}, "max_candidates"),
+        ({"max_model_calls": 1}, "max_model_calls"),
+        ({"max_sandboxes": 2}, "max_sandboxes"),
+    ],
+)
+def test_search_stops_at_each_configured_cap_offline(
+    tmp_path, monkeypatch, override, expected
+):
+    monkeypatch.chdir(tmp_path)
+    engine = install_offline_search_fakes(monkeypatch)
     config = {
         "rounds": 3,
         "width": 2,
@@ -488,3 +512,117 @@ def test_search_stops_at_each_configured_cap_offline(
     if expected_count == 2:
         assert "not selected" in result["candidates"][1]["selection_reason"]
     assert all(r["status"] == "destroyed" for r in result["resources"])
+
+
+def test_all_incorrect_run_has_no_best_candidate(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    verdicts = [make_verdict("test_failure", tests_passed=5) for _ in range(3)]
+    engine = install_offline_search_fakes(monkeypatch, verdicts=verdicts)
+    result = engine.run_search(
+        engine.Limits(rounds=2, width=2, max_candidates=3, max_sandboxes=4)
+    )
+    assert result["best_candidate_id"] is None
+    assert result["status"] == "failed"
+    assert result["revision_parent_id"] is not None
+    assert len(result["candidates"]) == 3
+
+
+def test_superseded_parent_keeps_selection_history(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    verdicts = [
+        make_verdict("correct", tests_passed=60, candidate_ms=5.0),
+        make_verdict("correct", tests_passed=60, candidate_ms=8.0),
+        make_verdict("correct", tests_passed=60, candidate_ms=3.0),
+    ]
+    engine = install_offline_search_fakes(monkeypatch, verdicts=verdicts)
+    result = engine.run_search(
+        engine.Limits(rounds=2, width=2, max_candidates=3, max_sandboxes=4)
+    )
+    by_id = {c["candidate_id"]: c for c in result["candidates"]}
+    assert result["best_candidate_id"] == "g1-c0"
+    assert "selected in round(s) [0]" in by_id["g0-c0"]["selection_reason"]
+    assert "superseded by g1-c0" in by_id["g0-c0"]["selection_reason"]
+
+
+def test_parent_remains_best_when_child_slower(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    verdicts = [
+        make_verdict("correct", tests_passed=60, candidate_ms=3.0),
+        make_verdict("correct", tests_passed=60, candidate_ms=4.5),
+    ]
+    engine = install_offline_search_fakes(monkeypatch, verdicts=verdicts)
+    result = engine.run_search(
+        engine.Limits(rounds=2, width=1, max_candidates=2, max_sandboxes=3)
+    )
+    by_id = {c["candidate_id"]: c for c in result["candidates"]}
+    assert result["best_candidate_id"] == "g0-c0"
+    assert "not selected" in by_id["g1-c0"]["selection_reason"]
+
+
+def test_incorrect_child_never_becomes_best(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    verdicts = [
+        make_verdict("correct", tests_passed=60, candidate_ms=5.0),
+        make_verdict("test_failure", tests_passed=12),
+    ]
+    engine = install_offline_search_fakes(monkeypatch, verdicts=verdicts)
+    result = engine.run_search(
+        engine.Limits(rounds=2, width=1, max_candidates=2, max_sandboxes=3)
+    )
+    by_id = {c["candidate_id"]: c for c in result["candidates"]}
+    assert result["best_candidate_id"] == "g0-c0"
+    assert result["status"] == "completed"
+    assert "not selected" in by_id["g1-c0"]["selection_reason"]
+
+
+def test_render_report_without_correct_candidate_has_no_selected_winner():
+    summary = {
+        "run_id": "search-no-winner",
+        "status": "failed",
+        "stop_reason": "max_rounds",
+        "best_candidate_id": None,
+        "revision_parent_id": "g0-c0",
+        "candidates": [
+            {
+                "candidate_id": "g0-c0",
+                "status": "test_failure",
+                "feedback": {"status": "test_failure", "tests_passed": 5, "total": 60},
+            }
+        ],
+    }
+    html = render_report(summary)
+    assert "SELECTED WINNER" not in html
+    assert "Revision parent" in html
+    assert "g0-c0" in html
+
+
+def test_live_selection_event_with_failing_parent_does_not_set_best(tmp_path):
+    path = tmp_path / "search-live-fail"
+    path.mkdir()
+    (path / "summary.json").write_text(
+        json.dumps(
+            {
+                "run_id": "search-live-fail",
+                "status": "running",
+                "best_candidate_id": None,
+                "candidates": [
+                    {"candidate_id": "g0-c0", "status": "test_failure"},
+                ],
+            }
+        )
+    )
+    events = [
+        {
+            "event": "selection",
+            "candidate_id": "g0-c0",
+            "role": "revision_parent",
+            "passing": False,
+            "best_candidate_id": None,
+            "revision_parent_id": "g0-c0",
+            "reason": "selected as revision parent only",
+        }
+    ]
+    (path / "events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events))
+    rows = list_runs(tmp_path)
+    assert rows[0]["best_candidate_id"] is None
+    assert rows[0]["revision_parent_id"] == "g0-c0"

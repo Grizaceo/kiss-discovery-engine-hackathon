@@ -6,7 +6,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
 - Review fixes verified: untrusted PID ignored; authoritative supervisor timing and separate trusted baseline; finite timing checks; input mutation detection; memory cap; root-only supervisor file.
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
-- 73 offline tests passed. No generated/fixture solution run on host.
+- 79 offline tests passed. No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
 - Added `docs/CREATEOS_REFERENCE.md`: verified CreateOS ecosystem reference (CLI, agent plugins, six SDKs, quotas, canonical links) carried over from the event preparation workspace; no code change.
 - Added `docs/CREATEOS_GUIDE.html`: full CreateOS usage guide (Spanish) built from the official documentation corpus (171 pages; live, self-contained HTML); carried over from the event preparation workspace; no code change.
@@ -28,4 +28,4 @@ Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459
 ## Next
 Ready for demo and external submission gates. Public GitHub push, public static report/demo URL, and submission to `https://projects.dev/leaderboard` (code `CreateOS-2026`, stack URL `https://projects.dev/s#v1:createos~project`) + the Discord deadline link require explicit user authorization.
 
-Last verified: 2026-10-17T19:15:00-03:00. Block 0 (K21): applied `ruff format src tests` (`src/kiss_engine/report.py` reformatted); `ruff check src tests` clean, 73 offline tests passed; Blocks 1–7 pending.
+Last verified: 2026-10-17T19:30:00-03:00. Block 1 (K01, K02, part of K20): separated `revision_parent_id` from `best_candidate_id` (only `correct`/`performance_met` candidates can be best; runs with no passing candidates end `failed`), preserved selection history when a parent is superseded in a later round (`selected_in_rounds` + `candidate_superseded` event), updated `report.py` and `web.py` (`Best correct candidate` + optional `Revision parent`), and added 6 offline tests (`79 passed`); Blocks 2–7 pending.

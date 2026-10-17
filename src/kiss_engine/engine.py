@@ -98,6 +98,7 @@ def run_search(limits=None):
         "config": config,
         "candidates": [],
         "best_candidate_id": None,
+        "revision_parent_id": None,
         "stop_reason": None,
         "resources": [],
         "warnings": [],
@@ -342,19 +343,63 @@ def run_search(limits=None):
                 winner = min(selectable, key=rank)
                 previous = parent
                 parent = winner
-                summary["best_candidate_id"] = winner["candidate_id"]
-                for cand in selectable:
-                    if cand["candidate_id"] != winner["candidate_id"]:
-                        cand["selection_reason"] = None
-                winner["selection_reason"] = (
-                    "correctness/test count first; fastest supervisor-measured median among tied passing candidates; noisy finite-run estimate"
+                summary["revision_parent_id"] = winner["candidate_id"]
+                passing_candidates = [
+                    c
+                    for c in summary["candidates"]
+                    if c.get("feedback", {}).get("status")
+                    in {"correct", "performance_met"}
+                ]
+                best_passing = (
+                    min(passing_candidates, key=rank) if passing_candidates else None
                 )
+                summary["best_candidate_id"] = (
+                    best_passing["candidate_id"] if best_passing else None
+                )
+                winner_passing = winner.get("feedback", {}).get("status") in {
+                    "correct",
+                    "performance_met",
+                }
+                winner.setdefault("selected_in_rounds", []).append(generation)
+                for cand in selectable:
+                    if cand is winner:
+                        continue
+                    if cand.get("selected_in_rounds"):
+                        cand["selection_reason"] = (
+                            f"selected in round(s) {cand['selected_in_rounds']} and used as parent; "
+                            f"superseded by {winner['candidate_id']} in round {generation}"
+                        )
+                        ledger.event(
+                            "candidate_superseded",
+                            candidate_id=cand["candidate_id"],
+                            superseded_by=winner["candidate_id"],
+                            round=generation,
+                        )
+                    else:
+                        cand["selection_reason"] = None
+                if winner_passing:
+                    winner["selection_reason"] = (
+                        "correctness/test count first; fastest supervisor-measured median among tied passing candidates; noisy finite-run estimate"
+                    )
+                else:
+                    w_fb = winner.get("feedback") or {}
+                    winner["selection_reason"] = (
+                        f"selected as revision parent only (not passing: status={winner['status']}, "
+                        f"{w_fb.get('tests_passed', 0)}/{w_fb.get('total', 60)} tests); "
+                        f"best={summary['best_candidate_id']}; correctness before measured speed"
+                    )
                 ledger.event(
                     "selection",
                     candidate_id=winner["candidate_id"],
                     previous_candidate_id=previous["candidate_id"]
                     if previous
                     else None,
+                    role="best_and_revision_parent"
+                    if winner_passing
+                    else "revision_parent",
+                    passing=winner_passing,
+                    best_candidate_id=summary["best_candidate_id"],
+                    revision_parent_id=summary["revision_parent_id"],
                     reason=winner["selection_reason"],
                 )
                 # Keep only reusable checkpoint plus base; destroy discarded children before next generation.
