@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KISS Discovery Engine · Static Evidence Bundle</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{font:15px/1.55 system-ui,-apple-system,sans-serif;background:#0e1117;color:#e6edf3;max-width:1120px;margin:36px auto;padding:0 24px}h1{font-size:34px;margin:4px 0 6px}h2{margin-top:0;font-size:21px}.overline{color:#50deb3;text-transform:uppercase;letter-spacing:2.5px;font-size:12px;margin:0}.subtitle,dt,small{color:#9eacbb}section{background:#151b23;border:1px solid #303b49;border-radius:14px;padding:22px;margin:18px 0}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}th,td{border-bottom:1px solid #273240;padding:10px 8px;text-align:left;vertical-align:top}th{color:#9eacbb;font-weight:600}.badge{font-size:12px;background:#333e50;padding:3px 9px;border-radius:12px;display:inline-block}.ok{background:#114932;color:#a0f0be}a{color:#79c0ff}code{font-family:monospace;color:#c9e1ff}.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}figure{margin:0;background:#0c1119;border:1px solid #273240;border-radius:10px;padding:12px}figure img{width:100%;height:auto;border-radius:6px;display:block}figcaption{font-size:13px;color:#9eacbb;margin-top:8px}
+</style>
+</head>
+<body>
+<p class="overline">CreateOS × Stripe Projects · Static Evidence Ledger (No JavaScript)</p>
+<h1>KISS Discovery Engine</h1>
+<p class="subtitle">An agent that writes code, runs every attempt in a real CreateOS microVM fork, and lets a trusted supervisor's tests decide.</p>
+
+<section>
+<h2>1. Standalone Search Reports (Derived with 5% Noise-Band Verdicts)</h2>
+<p class="subtitle">Generated from immutable <code>summary.json</code> artifacts via <code>render_report(summary, static=True)</code>. Ratios compare supervisor-measured candidate median against the same-VM trusted reference baseline (<code>NOISE_BAND = 0.05</code>).</p>
+<table>
+<thead>
+<tr><th>Run ID</th><th>Chain &amp; Lineage</th><th>Candidate Verdicts</th><th>Cleanup</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="search-20261017T215022-01459f/report.html"><b>search-20261017T215022-01459f</b></a><br><small>Primary 2-approach + revision demo</small></td>
+<td>Paused base <code>sb-01m55xge5pz50x960atf55199r</code> → Gen 0 forks <code>g0-c0</code> &amp; <code>g0-c1</code> → <code>g0-c0</code> paused → Gen 1 physical fork <code>g1-c0</code></td>
+<td>
+• <code>g0-c0</code> (<code>sorted-bisect</code>, 60/60): <code>0.97× baseline · parity within measurement noise</code> (<code>6.942 / 7.133 ms</code>)<br>
+• <code>g0-c1</code> (<code>two-pointer</code>, 60/60): <code>1.35× baseline · slower</code> (<code>9.667 / 7.166 ms</code>)<br>
+• <code>g1-c0</code> (<code>parent-feedback-revision</code>, 60/60): <code>0.89× baseline · parity within measurement noise</code> (<code>6.553 / 7.346 ms</code>, <code>agreement: false</code>; selected by rule)
+</td>
+<td><span class="badge ok">4/4 destroyed</span></td>
+</tr>
+<tr>
+<td><a href="search-20261017T200437-128ee8/report.html"><b>search-20261017T200437-128ee8</b></a><br><small>Contrast 1-width chain (parent stays ahead)</small></td>
+<td>Paused base <code>sb-01m55qessrtxsccap1d6j0ntr8</code> → <code>g0-c0</code> → physical fork <code>g1-c0</code></td>
+<td>
+• <code>g0-c0</code> (<code>sorted-bisect</code>, 60/60): <code>0.98× baseline · parity within measurement noise</code> (<code>6.515 / 6.661 ms</code>; kept as best)<br>
+• <code>g1-c0</code> (<code>parent-feedback-revision</code>, 60/60): <code>0.98× baseline · parity within measurement noise</code> (<code>6.587 / 6.753 ms</code>; slower in raw ms, not selected)
+</td>
+<td><span class="badge ok">3/3 destroyed</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2>2. Platform Verification Artifacts (CreateOS Smoke, Failure Fixtures, Resource Audit)</h2>
+<table>
+<thead>
+<tr><th>Artifact</th><th>Command</th><th>Verified Evidence</th><th>Cleanup</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="smoke-20261017T200218-804c8e/summary.json"><code>smoke-20261017T200218-804c8e/summary.json</code></a></td>
+<td><code>uv run kiss smoke</code></td>
+<td><code>inheritance_verified: true</code>, <code>independence_verified: true</code>, 2 children running concurrently while base paused, egress <code>pypi.org: 200</code> / <code>example.com: URLError</code></td>
+<td><span class="badge ok">3/3 destroyed</span></td>
+</tr>
+<tr>
+<td><a href="fixtures-20261017T195514-b9747e/summary.json"><code>fixtures-20261017T195514-b9747e/summary.json</code></a></td>
+<td><code>uv run kiss failures</code></td>
+<td>5/5 remote failure fixtures (not Mercury) classified as expected: <code>incorrect → test_failure</code>, <code>controlled-timeout → timeout</code>, <code>syntax-error → compilation_error</code>, <code>input-mutation → test_failure</code>, <code>timing-spoof (time.perf_counter) → protocol_error</code></td>
+<td><span class="badge ok">6/6 destroyed</span></td>
+</tr>
+<tr>
+<td><a href="audit-20261017T215138-6151e4/summary.json"><code>audit-20261017T215138-6151e4/summary.json</code></a></td>
+<td><code>uv run kiss audit</code></td>
+<td>Read-only reconciliation across all recorded runs: <b>34/34 owned CreateOS sandboxes verified <code>destroyed</code></b> (<code>unresolved: []</code>); <code>20,350</code> provider-reported tokens across 16 Mercury 2.5 calls</td>
+<td><span class="badge ok">34/34 destroyed</span></td>
+</tr>
+</tbody>
+</table>
+<p><small>See <a href="README.md"><code>evidence/README.md</code></a> for provenance details.</small></p>
+</section>
+
+<section>
+<h2>3. Dashboard &amp; Report Captures</h2>
+<div class="cols">
+<figure>
+<a href="captures-20261017/dashboard-completed.png"><img src="captures-20261017/dashboard-completed.png" alt="Completed dashboard view"></a>
+<figcaption><a href="captures-20261017/dashboard-completed.png"><code>dashboard-completed.png</code></a> — Experiment ledger with completed chains.</figcaption>
+</figure>
+<figure>
+<a href="captures-20261017/dashboard-live-running.png"><img src="captures-20261017/dashboard-live-running.png" alt="Live running dashboard view"></a>
+<figcaption><a href="captures-20261017/dashboard-live-running.png"><code>dashboard-live-running.png</code></a> — Live in-progress state during <code>search-20261017T215022-01459f</code>.</figcaption>
+</figure>
+<figure>
+<a href="captures-20261017/report-search-20261017T215022-01459f.png"><img src="captures-20261017/report-search-20261017T215022-01459f.png" alt="Standalone report screenshot"></a>
+<figcaption><a href="captures-20261017/report-search-20261017T215022-01459f.png"><code>report-search-20261017T215022-01459f.png</code></a> — Standalone evidence report.</figcaption>
+</figure>
+</div>
+</section>
+</body>
+</html>

@@ -690,3 +690,11 @@ def test_smoke_expect_raises_runtime_error():
     expect("base-marker", "base-marker", "marker check")
     with pytest.raises(RuntimeError, match="Smoke check failed"):
         expect("wrong", "base-marker", "marker check")
+
+
+def test_render_report_static_omits_local_back_link():
+    summary = {"run_id": "search-static", "status": "completed", "candidates": []}
+    assert "← Back to local experiment ledger" in render_report(summary, static=False)
+    assert "← Back to local experiment ledger" not in render_report(
+        summary, static=True
+    )

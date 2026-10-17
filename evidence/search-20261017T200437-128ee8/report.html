@@ -1,0 +1,339 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KISS · search-20261017T200437-128ee8</title>
+<style>:root{color-scheme:dark}body{font:15px/1.55 system-ui;background:#0e1117;color:#e6edf3;max-width:1120px;margin:36px auto;padding:0 24px}h1{font-size:34px;margin-bottom:4px}h2{margin-top:0}.subtitle,dt{color:#9eacbb}header p{font-size:13px;color:#9eacbb}article,.panel{background:#151b23;border:1px solid #303b49;border-radius:14px;padding:22px;margin:18px 0}.best-card{border-color:#2ea043}dl{display:grid;grid-template-columns:230px 1fr;gap:9px}dd{margin:0;overflow-wrap:anywhere}pre{background:#0c1119;padding:16px;overflow:auto;font:12px/1.6 monospace;max-height:600px;border-radius:8px}.badge{font-size:12px;background:#333e50;padding:4px 9px;border-radius:12px;display:inline-block}.correct,.faster,.winner{background:#114932;color:#a0f0be}.live{background:#5a3e0b;color:#ffd885}.err{color:#ffac9c}summary{cursor:pointer;padding:8px 0;font-weight:600}a{color:#79c0ff}.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:760px){.cols,dl{grid-template-columns:1fr}}</style>
+<h1>KISS Discovery Engine</h1><p class="subtitle">Evidence, not confidence. Mercury 2.5 · Inception direct · real CreateOS microVM forks.</p>
+<section class="panel"><p><span class="badge ">HISTORICAL EVIDENCE ARTIFACT · COMPLETED</span></p><h2>search-20261017T200437-128ee8</h2><dl><dt>Run status &amp; stop reason</dt><dd><b>completed</b> · max_rounds (configured generation rounds completed)</dd><dt>Best correct candidate</dt><dd><b>g0-c0</b> (rule: 60/60 correctness first, then tests_passed, then lowest supervisor-measured median ms)</dd><dt>Started / finished (UTC)</dt><dd>2026-10-17T20:04:37.779165+00:00 → 2026-10-17T20:05:17.711502+00:00</dd><dt>Mercury 2.5 HTTP calls</dt><dd>2</dd><dt>Owned CreateOS microVMs</dt><dd>3/3 verified destroyed</dd></dl><p class="err"></p><p class="err"></p><p class="subtitle">Timing methodology and caveats are recorded per candidate. Subtraction of IPC/data-generation overhead is noisy: <code>performance_met</code> is a finite-run threshold, not a portable speedup proof.</p></section>
+<section class="panel"><h2>Task contract · count_pairs (T1b)</h2><p><code>count_pairs(a: list[int], b: list[int], lower: int, upper: int) -&gt; int</code> — count cross-list index pairs <code>(i, j)</code> such that <code>lower &lt;= a[i] + b[j] &lt;= upper</code> (inclusive). Duplicates count by index; empty lists or <code>lower &gt; upper</code> return <code>0</code>; caller inputs must not be mutated; Python 3 standard library only; <code>|a[i]|, |b[j]| &lt;= 10^9</code>, <code>|lower|, |upper| &lt;= 2×10^9</code>, up to <code>10^6</code> elements. Evaluated remotely as unprivileged <code>nobody</code> worker under a root-owned supervisor across 60 correctness tests and 3 seeded datasets of <code>N=20000</code> items per list.</p></section>
+<section class="panel"><h2>Lineage: Logical code ancestry vs. Physical microVM forks</h2><div class="cols"><div><h3>1. Logical solution lineage (code &amp; feedback)</h3><ul><li><b>∅ (initial generation 0)</b> → <b>g0-c0</b> (sorted-bisect) · status: <b>performance_met</b></li><li><b>g0-c0</b> → <b>g1-c0</b> (parent-feedback-revision) · status: <b>performance_met</b></li></ul><p class="subtitle">Generation 1+ receives only its own logical parent's code and measured feedback.</p></div><div><h3>2. Physical microVM lineage (CreateOS pause → fork)</h3><ul><li><b>g0-c0</b>: paused VM <code>sb-01m55qessrtxsccap1d6j0ntr8</code> → forked child VM <code>sb-01m55qf2t7vbfr2jd2z315mtf8</code></li><li><b>g1-c0</b>: paused VM <code>sb-01m55qf2t7vbfr2jd2z315mtf8</code> → forked child VM <code>sb-01m55qffayewm116ph9f2ymhsp</code></li></ul><p class="subtitle">Gen 0 forks from the paused base VM; Gen 1+ physically forks from its logical parent's paused VM.</p></div></div></section>
+<article class="candidate best-card"><header><h2>g0-c0 <span class="badge performance_met">performance_met</span> <span class="badge">0.98× baseline · parity within measurement noise</span> <span class="badge winner">SELECTED WINNER</span></h2>
+<p>Code parent: <b>∅ (initial)</b> → <b>g0-c0</b> · Generation 0 · initial candidate (no parent code)</p></header>
+<dl><dt>Approach</dt><dd>sorted-bisect</dd><dt>Physical microVM &amp; fork</dt><dd>sb-01m55qf2t7vbfr2jd2z315mtf8 ← physically forked from paused VM sb-01m55qessrtxsccap1d6j0ntr8</dd><dt>Source SHA256</dt><dd>f5709b076b09b493859df7eaec85f6e3b417a33bc25a8e48993d10c7688f05c6</dd><dt>Correctness tests</dt><dd>60/60 (phase: benchmark)</dd><dt>Candidate / baseline median</dt><dd>6.515 ms (raw: 6.514931000000335) / 6.661 ms (raw: 6.660694999999883) · <b>0.98× baseline · parity within measurement noise</b></dd><dt>Timing methodology</dt><dd>Authoritative supervisor wall-clock minus null-roundtrip IPC overhead (3 distinct datasets) · single-shot root cross-check agreement=False</dd><dt>Generation / evaluation wall</dt><dd>1867.939 ms (raw: 1867.939365998609) / 586.520 ms (raw: 586.5196459999424)</dd><dt>Selection outcome</dt><dd>correctness/test count first; fastest supervisor-measured median among tied passing candidates; noisy finite-run estimate</dd><dt>Model explanation</dt><dd>Sort list b once, then for each element in a, use binary search to count how many elements in b yield a sum within [lower, upper]. This achieves O(n log n + m log n) time and handles duplicates correctly via bisect functions.</dd></dl>
+<details open><summary>Code · actual provider response</summary><pre><code>from bisect import bisect_left, bisect_right
+
+def count_pairs(a: list[int], b: list[int], lower: int, upper: int) -&gt; int:
+    if lower &gt; upper or not a or not b:
+        return 0
+    b_sorted = sorted(b)
+    count = 0
+    for x in a:
+        low = lower - x
+        high = upper - x
+        left = bisect_left(b_sorted, low)
+        right = bisect_right(b_sorted, high)
+        count += right - left
+    return count</code></pre></details>
+<details><summary>Feedback, methodology and raw execution</summary><pre>{
+  &quot;feedback&quot;: {
+    &quot;baseline_ms&quot;: 6.660694999999883,
+    &quot;benchmark&quot;: {
+      &quot;agreement&quot;: false,
+      &quot;authoritative_timing&quot;: {
+        &quot;candidate_samples_ms&quot;: [
+          4.768408999999529,
+          6.514931000000335,
+          7.021543000000463
+        ],
+        &quot;reliable_subtraction&quot;: true,
+        &quot;samples&quot;: [
+          {
+            &quot;candidate_adjusted_ms&quot;: 4.768408999999529,
+            &quot;candidate_roundtrip_ms&quot;: 14.382062999999778,
+            &quot;overhead_roundtrip_ms&quot;: 9.613654000000249,
+            &quot;seed&quot;: 346874994,
+            &quot;trusted_baseline_ms&quot;: 6.660694999999883
+          },
+          {
+            &quot;candidate_adjusted_ms&quot;: 6.514931000000335,
+            &quot;candidate_roundtrip_ms&quot;: 14.426617000000252,
+            &quot;overhead_roundtrip_ms&quot;: 7.911685999999918,
+            &quot;seed&quot;: 346874995,
+            &quot;trusted_baseline_ms&quot;: 6.6231339999998085
+          },
+          {
+            &quot;candidate_adjusted_ms&quot;: 7.021543000000463,
+            &quot;candidate_roundtrip_ms&quot;: 13.936125000000299,
+            &quot;overhead_roundtrip_ms&quot;: 6.914581999999836,
+            &quot;seed&quot;: 346874996,
+            &quot;trusted_baseline_ms&quot;: 6.6780479999999365
+          }
+        ],
+        &quot;trusted_baseline_samples_ms&quot;: [
+          6.660694999999883,
+          6.6231339999998085,
+          6.6780479999999365
+        ]
+      },
+      &quot;baseline_count&quot;: 111279790,
+      &quot;baseline_reps_ms&quot;: [
+        7.703573999999769,
+        7.169801000000309,
+        6.917768000000102
+      ],
+      &quot;candidate_count&quot;: 111279790,
+      &quot;candidate_reps_ms&quot;: [
+        8.58929900000005,
+        8.919789999999761,
+        8.53358400000026
+      ],
+      &quot;copies_per_rep&quot;: true,
+      &quot;dataset&quot;: &quot;generated inside the worker from the seed; verified by sha256 digest&quot;,
+      &quot;digest&quot;: &quot;3d93599ca651dc549bed51b59415f4782d1dd68777cf4933b11faed50740be83&quot;,
+      &quot;expected_count&quot;: 111279790,
+      &quot;limitations&quot;: [
+        &quot;diagnostic worker timings are untrusted; selected score uses supervisor wall and a separate trusted baseline&quot;,
+        &quot;candidate net timing subtracts noisy IPC/data-generation overhead; not a robust portable speedup&quot;,
+        &quot;the root-side wall clock bounds that claim from outside but cannot fully isolate the candidate&quot;,
+        &quot;single sandbox, single machine: not a portable benchmark claim&quot;
+      ],
+      &quot;lower&quot;: -346874993,
+      &quot;n&quot;: 20000,
+      &quot;reps&quot;: 3,
+      &quot;root_measurement&quot;: {
+        &quot;baseline_net_ms&quot;: 13.392112000000012,
+        &quot;baseline_wall_ms&quot;: 20.496451000000082,
+        &quot;candidate_net_ms&quot;: 13.740366999999587,
+        &quot;candidate_wall_ms&quot;: 20.844705999999658,
+        &quot;method&quot;: &quot;root supervisor wall clock around each bench round trip, minus an identical overhead-only probe (which=&#x27;none&#x27;)&quot;,
+        &quot;note&quot;: &quot;cross-check of the untrusted self-timing only: single-shot point estimates that include IPC, JSON and array-generation noise, not a statistical measure&quot;,
+        &quot;overhead_wall_ms&quot;: 7.104339000000071
+      },
+      &quot;seed&quot;: 346874993,
+      &quot;statistic&quot;: &quot;median of 3 supervisor-measured distinct-dataset repetitions; candidate IPC overhead estimated by same-dataset null roundtrip&quot;,
+      &quot;timed_where&quot;: &quot;authoritative: trusted supervisor wall; diagnostic *_reps_ms: inside untrusted worker&quot;,
+      &quot;upper&quot;: 256194574,
+      &quot;warmup&quot;: 1,
+      &quot;worker_baseline_median_ms&quot;: 7.169801000000309,
+      &quot;worker_candidate_median_ms&quot;: 8.58929900000005
+    },
+    &quot;benchmark_n&quot;: 20000,
+    &quot;candidate_ms&quot;: 6.514931000000335,
+    &quot;compile_ok&quot;: true,
+    &quot;detail&quot;: null,
+    &quot;elapsed_ms&quot;: 365.20116500000023,
+    &quot;error_subtype&quot;: null,
+    &quot;error_type&quot;: &quot;performance_met&quot;,
+    &quot;errors&quot;: [],
+    &quot;exception_type&quot;: null,
+    &quot;phase&quot;: &quot;benchmark&quot;,
+    &quot;protocol&quot;: {
+      &quot;budget_s&quot;: 20.0,
+      &quot;candidate_path&quot;: &quot;/workspace/candidate/solution.py&quot;,
+      &quot;framing&quot;: &quot;newline-delimited JSON, one request object and one response object per line&quot;,
+      &quot;output_caps_bytes&quot;: {
+        &quot;max_line&quot;: 4194304,
+        &quot;max_total&quot;: 16777216
+      },
+      &quot;request_cap_bytes&quot;: 16777216,
+      &quot;runs_as_user&quot;: &quot;nobody&quot;,
+      &quot;spawn&quot;: &quot;runuser -u nobody -- env -i &lt;minimal env&gt; python3 -I worker.py&quot;,
+      &quot;supervisor_imports_candidate&quot;: false,
+      &quot;version&quot;: 1,
+      &quot;worker_imports_candidate&quot;: true,
+      &quot;worker_path&quot;: &quot;/workspace/.kiss_trusted/worker.py&quot;
+    },
+    &quot;protocol_version&quot;: 1,
+    &quot;seed&quot;: 1729,
+    &quot;speedup&quot;: 1.022373836346009,
+    &quot;status&quot;: &quot;performance_met&quot;,
+    &quot;supervisor_self_protect&quot;: {
+      &quot;mode&quot;: &quot;0o400&quot;,
+      &quot;path&quot;: &quot;/workspace/.kiss_trusted/harness.py&quot;
+    },
+    &quot;tests_passed&quot;: 60,
+    &quot;total&quot;: 60,
+    &quot;worker&quot;: {
+      &quot;numpy&quot;: false,
+      &quot;pid&quot;: null,
+      &quot;python&quot;: &quot;3.12.3&quot;,
+      &quot;user&quot;: &quot;nobody&quot;
+    }
+  },
+  &quot;execution&quot;: {
+    &quot;standard_output&quot;: &quot;{\&quot;baseline_ms\&quot;: 6.660694999999883, \&quot;benchmark\&quot;: {\&quot;agreement\&quot;: false, \&quot;authoritative_timing\&quot;: {\&quot;candidate_samples_ms\&quot;: [4.768408999999529, 6.514931000000335, 7.021543000000463], \&quot;reliable_subtraction\&quot;: true, \&quot;samples\&quot;: [{\&quot;candidate_adjusted_ms\&quot;: 4.768408999999529, \&quot;candidate_roundtrip_ms\&quot;: 14.382062999999778, \&quot;overhead_roundtrip_ms\&quot;: 9.613654000000249, \&quot;seed\&quot;: 346874994, \&quot;trusted_baseline_ms\&quot;: 6.660694999999883}, {\&quot;candidate_adjusted_ms\&quot;: 6.514931000000335, \&quot;candidate_roundtrip_ms\&quot;: 14.426617000000252, \&quot;overhead_roundtrip_ms\&quot;: 7.911685999999918, \&quot;seed\&quot;: 346874995, \&quot;trusted_baseline_ms\&quot;: 6.6231339999998085}, {\&quot;candidate_adjusted_ms\&quot;: 7.021543000000463, \&quot;candidate_roundtrip_ms\&quot;: 13.936125000000299, \&quot;overhead_roundtrip_ms\&quot;: 6.914581999999836, \&quot;seed\&quot;: 346874996, \&quot;trusted_baseline_ms\&quot;: 6.6780479999999365}], \&quot;trusted_baseline_samples_ms\&quot;: [6.660694999999883, 6.6231339999998085, 6.6780479999999365]}, \&quot;baseline_count\&quot;: 111279790, \&quot;baseline_reps_ms\&quot;: [7.703573999999769, 7.169801000000309, 6.917768000000102], \&quot;candidate_count\&quot;: 111279790, \&quot;candidate_reps_ms\&quot;: [8.58929900000005, 8.919789999999761, 8.53358400000026], \&quot;copies_per_rep\&quot;: true, \&quot;dataset\&quot;: \&quot;generated inside the worker from the seed; verified by sha256 digest\&quot;, \&quot;digest\&quot;: \&quot;3d93599ca651dc549bed51b59415f4782d1dd68777cf4933b11faed50740be83\&quot;, \&quot;expected_count\&quot;: 111279790, \&quot;limitations\&quot;: [\&quot;diagnostic worker timings are untrusted; selected score uses supervisor wall and a separate trusted baseline\&quot;, \&quot;candidate net timing subtracts noisy IPC/data-generation overhead; not a robust portable speedup\&quot;, \&quot;the root-side wall clock bounds that claim from outside but cannot fully isolate the candidate\&quot;, \&quot;single sandbox, single machine: not a portable benchmark claim\&quot;], \&quot;lower\&quot;: -346874993, \&quot;n\&quot;: 20000, \&quot;reps\&quot;: 3, \&quot;root_measurement\&quot;: {\&quot;baseline_net_ms\&quot;: 13.392112000000012, \&quot;baseline_wall_ms\&quot;: 20.496451000000082, \&quot;candidate_net_ms\&quot;: 13.740366999999587, \&quot;candidate_wall_ms\&quot;: 20.844705999999658, \&quot;method\&quot;: \&quot;root supervisor wall clock around each bench round trip, minus an identical overhead-only probe (which=&#x27;none&#x27;)\&quot;, \&quot;note\&quot;: \&quot;cross-check of the untrusted self-timing only: single-shot point estimates that include IPC, JSON and array-generation noise, not a statistical measure\&quot;, \&quot;overhead_wall_ms\&quot;: 7.104339000000071}, \&quot;seed\&quot;: 346874993, \&quot;statistic\&quot;: \&quot;median of 3 supervisor-measured distinct-dataset repetitions; candidate IPC overhead estimated by same-dataset null roundtrip\&quot;, \&quot;timed_where\&quot;: \&quot;authoritative: trusted supervisor wall; diagnostic *_reps_ms: inside untrusted worker\&quot;, \&quot;upper\&quot;: 256194574, \&quot;warmup\&quot;: 1, \&quot;worker_baseline_median_ms\&quot;: 7.169801000000309, \&quot;worker_candidate_median_ms\&quot;: 8.58929900000005}, \&quot;benchmark_n\&quot;: 20000, \&quot;candidate_ms\&quot;: 6.514931000000335, \&quot;compile_ok\&quot;: true, \&quot;detail\&quot;: null, \&quot;elapsed_ms\&quot;: 365.20116500000023, \&quot;error_subtype\&quot;: null, \&quot;error_type\&quot;: \&quot;performance_met\&quot;, \&quot;errors\&quot;: [], \&quot;exception_type\&quot;: null, \&quot;phase\&quot;: \&quot;benchmark\&quot;, \&quot;protocol\&quot;: {\&quot;budget_s\&quot;: 20.0, \&quot;candidate_path\&quot;: \&quot;/workspace/candidate/solution.py\&quot;, \&quot;framing\&quot;: \&quot;newline-delimited JSON, one request object and one response object per line\&quot;, \&quot;output_caps_bytes\&quot;: {\&quot;max_line\&quot;: 4194304, \&quot;max_total\&quot;: 16777216}, \&quot;request_cap_bytes\&quot;: 16777216, \&quot;runs_as_user\&quot;: \&quot;nobody\&quot;, \&quot;spawn\&quot;: \&quot;runuser -u nobody -- env -i &lt;minimal env&gt; python3 -I worker.py\&quot;, \&quot;supervisor_imports_candidate\&quot;: false, \&quot;version\&quot;: 1, \&quot;worker_imports_candidate\&quot;: true, \&quot;worker_path\&quot;: \&quot;/workspace/.kiss_trusted/worker.py\&quot;}, \&quot;protocol_version\&quot;: 1, \&quot;seed\&quot;: 1729, \&quot;speedup\&quot;: 1.022373836346009, \&quot;status\&quot;: \&quot;performance_met\&quot;, \&quot;supervisor_self_protect\&quot;: {\&quot;mode\&quot;: \&quot;0o400\&quot;, \&quot;path\&quot;: \&quot;/workspace/.kiss_trusted/harness.py\&quot;}, \&quot;tests_passed\&quot;: 60, \&quot;total\&quot;: 60, \&quot;worker\&quot;: {\&quot;numpy\&quot;: false, \&quot;pid\&quot;: null, \&quot;python\&quot;: \&quot;3.12.3\&quot;, \&quot;user\&quot;: \&quot;nobody\&quot;}}\n&quot;,
+    &quot;standard_error&quot;: &quot;harness status=performance_met phase=benchmark tests=60/60 elapsed=365ms\n&quot;,
+    &quot;exit_code&quot;: 0,
+    &quot;error_message&quot;: &quot;&quot;
+  }
+}</pre></details></article><article class="candidate"><header><h2>g1-c0 <span class="badge performance_met">performance_met</span> <span class="badge">0.98× baseline · parity within measurement noise</span></h2>
+<p>Code parent: <b>g0-c0</b> → <b>g1-c0</b> · Generation 1 · revision of logical code parent g0-c0 (received g0-c0 code + measured feedback)</p></header>
+<dl><dt>Approach</dt><dd>Sort the smaller list and iterate over the larger one to minimize total binary search operations. Use local bindings for bisect functions and cached values to reduce loop overhead. Preserve early-exit logic and input immutability.</dd><dt>Physical microVM &amp; fork</dt><dd>sb-01m55qffayewm116ph9f2ymhsp ← physically forked from paused VM sb-01m55qf2t7vbfr2jd2z315mtf8</dd><dt>Source SHA256</dt><dd>56ce32936f3dc4f13b7c5a9e9a431d8bacb81586b98bcc8328f67f0f095e1181</dd><dt>Correctness tests</dt><dd>60/60 (phase: benchmark)</dd><dt>Candidate / baseline median</dt><dd>6.587 ms (raw: 6.587045999999042) / 6.753 ms (raw: 6.7527479999993645) · <b>0.98× baseline · parity within measurement noise</b></dd><dt>Timing methodology</dt><dd>Authoritative supervisor wall-clock minus null-roundtrip IPC overhead (3 distinct datasets) · single-shot root cross-check agreement=False</dd><dt>Generation / evaluation wall</dt><dd>1850.752 ms (raw: 1850.751736001257) / 564.131 ms (raw: 564.1309869970428)</dd><dt>Selection outcome</dt><dd>not selected (historical record): status=performance_met (60/60 tests, median 6.587 ms); best=g0-c0 ranked ahead on correctness then median ms</dd><dt>Model explanation</dt><dd>The parent solution always sorts b and iterates over a. If a is much smaller than b, this is inefficient. By sorting the smaller list and iterating over the larger one, we minimize the number of binary searches and the size of the sorted structure. Local variable caching of bisect functions and computed bounds removes redundant attribute and arithmetic lookups inside the loop. The approach remains O((n+m) log min(n,m)) time and O(min(n,m)) extra space, which is optimal for this problem under the constraints.</dd></dl>
+<details open><summary>Code · actual provider response</summary><pre><code>from bisect import bisect_left, bisect_right
+
+def count_pairs(a: list[int], b: list[int], lower: int, upper: int) -&gt; int:
+    if lower &gt; upper or not a or not b:
+        return 0
+    # Sort the smaller list to minimize O(N log M) work
+    if len(a) &lt;= len(b):
+        xs, ys = a, sorted(b)
+    else:
+        xs, ys = b, sorted(a)
+    count = 0
+    # Local bindings to avoid repeated global lookups
+    b_left = bisect_left
+    b_right = bisect_right
+    for x in xs:
+        low = lower - x
+        high = upper - x
+        left = b_left(ys, low)
+        right = b_right(ys, high)
+        count += right - left
+    return count</code></pre></details>
+<details><summary>Feedback, methodology and raw execution</summary><pre>{
+  &quot;feedback&quot;: {
+    &quot;baseline_ms&quot;: 6.7527479999993645,
+    &quot;benchmark&quot;: {
+      &quot;agreement&quot;: false,
+      &quot;authoritative_timing&quot;: {
+        &quot;candidate_samples_ms&quot;: [
+          4.527648000000717,
+          6.587045999999042,
+          7.130799000000465
+        ],
+        &quot;reliable_subtraction&quot;: true,
+        &quot;samples&quot;: [
+          {
+            &quot;candidate_adjusted_ms&quot;: 4.527648000000717,
+            &quot;candidate_roundtrip_ms&quot;: 14.462104000000586,
+            &quot;overhead_roundtrip_ms&quot;: 9.93445599999987,
+            &quot;seed&quot;: 346874994,
+            &quot;trusted_baseline_ms&quot;: 6.935711000000566
+          },
+          {
+            &quot;candidate_adjusted_ms&quot;: 6.587045999999042,
+            &quot;candidate_roundtrip_ms&quot;: 14.734885999999392,
+            &quot;overhead_roundtrip_ms&quot;: 8.14784000000035,
+            &quot;seed&quot;: 346874995,
+            &quot;trusted_baseline_ms&quot;: 6.699497999999693
+          },
+          {
+            &quot;candidate_adjusted_ms&quot;: 7.130799000000465,
+            &quot;candidate_roundtrip_ms&quot;: 14.208828000000118,
+            &quot;overhead_roundtrip_ms&quot;: 7.078028999999653,
+            &quot;seed&quot;: 346874996,
+            &quot;trusted_baseline_ms&quot;: 6.7527479999993645
+          }
+        ],
+        &quot;trusted_baseline_samples_ms&quot;: [
+          6.935711000000566,
+          6.699497999999693,
+          6.7527479999993645
+        ]
+      },
+      &quot;baseline_count&quot;: 111279790,
+      &quot;baseline_reps_ms&quot;: [
+        6.924420999999903,
+        6.688707999999544,
+        6.653752000000068
+      ],
+      &quot;candidate_count&quot;: 111279790,
+      &quot;candidate_reps_ms&quot;: [
+        6.740183999999871,
+        6.914011000000109,
+        6.8279589999997725
+      ],
+      &quot;copies_per_rep&quot;: true,
+      &quot;dataset&quot;: &quot;generated inside the worker from the seed; verified by sha256 digest&quot;,
+      &quot;digest&quot;: &quot;3d93599ca651dc549bed51b59415f4782d1dd68777cf4933b11faed50740be83&quot;,
+      &quot;expected_count&quot;: 111279790,
+      &quot;limitations&quot;: [
+        &quot;diagnostic worker timings are untrusted; selected score uses supervisor wall and a separate trusted baseline&quot;,
+        &quot;candidate net timing subtracts noisy IPC/data-generation overhead; not a robust portable speedup&quot;,
+        &quot;the root-side wall clock bounds that claim from outside but cannot fully isolate the candidate&quot;,
+        &quot;single sandbox, single machine: not a portable benchmark claim&quot;
+      ],
+      &quot;lower&quot;: -346874993,
+      &quot;n&quot;: 20000,
+      &quot;reps&quot;: 3,
+      &quot;root_measurement&quot;: {
+        &quot;baseline_net_ms&quot;: 13.587751000000203,
+        &quot;baseline_wall_ms&quot;: 20.737084000000294,
+        &quot;candidate_net_ms&quot;: 14.051473000000314,
+        &quot;candidate_wall_ms&quot;: 21.200806000000405,
+        &quot;method&quot;: &quot;root supervisor wall clock around each bench round trip, minus an identical overhead-only probe (which=&#x27;none&#x27;)&quot;,
+        &quot;note&quot;: &quot;cross-check of the untrusted self-timing only: single-shot point estimates that include IPC, JSON and array-generation noise, not a statistical measure&quot;,
+        &quot;overhead_wall_ms&quot;: 7.149333000000091
+      },
+      &quot;seed&quot;: 346874993,
+      &quot;statistic&quot;: &quot;median of 3 supervisor-measured distinct-dataset repetitions; candidate IPC overhead estimated by same-dataset null roundtrip&quot;,
+      &quot;timed_where&quot;: &quot;authoritative: trusted supervisor wall; diagnostic *_reps_ms: inside untrusted worker&quot;,
+      &quot;upper&quot;: 256194574,
+      &quot;warmup&quot;: 1,
+      &quot;worker_baseline_median_ms&quot;: 6.688707999999544,
+      &quot;worker_candidate_median_ms&quot;: 6.8279589999997725
+    },
+    &quot;benchmark_n&quot;: 20000,
+    &quot;candidate_ms&quot;: 6.587045999999042,
+    &quot;compile_ok&quot;: true,
+    &quot;detail&quot;: null,
+    &quot;elapsed_ms&quot;: 350.54769200000015,
+    &quot;error_subtype&quot;: null,
+    &quot;error_type&quot;: &quot;performance_met&quot;,
+    &quot;errors&quot;: [],
+    &quot;exception_type&quot;: null,
+    &quot;phase&quot;: &quot;benchmark&quot;,
+    &quot;protocol&quot;: {
+      &quot;budget_s&quot;: 20.0,
+      &quot;candidate_path&quot;: &quot;/workspace/candidate/solution.py&quot;,
+      &quot;framing&quot;: &quot;newline-delimited JSON, one request object and one response object per line&quot;,
+      &quot;output_caps_bytes&quot;: {
+        &quot;max_line&quot;: 4194304,
+        &quot;max_total&quot;: 16777216
+      },
+      &quot;request_cap_bytes&quot;: 16777216,
+      &quot;runs_as_user&quot;: &quot;nobody&quot;,
+      &quot;spawn&quot;: &quot;runuser -u nobody -- env -i &lt;minimal env&gt; python3 -I worker.py&quot;,
+      &quot;supervisor_imports_candidate&quot;: false,
+      &quot;version&quot;: 1,
+      &quot;worker_imports_candidate&quot;: true,
+      &quot;worker_path&quot;: &quot;/workspace/.kiss_trusted/worker.py&quot;
+    },
+    &quot;protocol_version&quot;: 1,
+    &quot;seed&quot;: 1729,
+    &quot;speedup&quot;: 1.0251557374884503,
+    &quot;status&quot;: &quot;performance_met&quot;,
+    &quot;supervisor_self_protect&quot;: {
+      &quot;mode&quot;: &quot;0o400&quot;,
+      &quot;path&quot;: &quot;/workspace/.kiss_trusted/harness.py&quot;
+    },
+    &quot;tests_passed&quot;: 60,
+    &quot;total&quot;: 60,
+    &quot;worker&quot;: {
+      &quot;numpy&quot;: false,
+      &quot;pid&quot;: null,
+      &quot;python&quot;: &quot;3.12.3&quot;,
+      &quot;user&quot;: &quot;nobody&quot;
+    }
+  },
+  &quot;execution&quot;: {
+    &quot;standard_output&quot;: &quot;{\&quot;baseline_ms\&quot;: 6.7527479999993645, \&quot;benchmark\&quot;: {\&quot;agreement\&quot;: false, \&quot;authoritative_timing\&quot;: {\&quot;candidate_samples_ms\&quot;: [4.527648000000717, 6.587045999999042, 7.130799000000465], \&quot;reliable_subtraction\&quot;: true, \&quot;samples\&quot;: [{\&quot;candidate_adjusted_ms\&quot;: 4.527648000000717, \&quot;candidate_roundtrip_ms\&quot;: 14.462104000000586, \&quot;overhead_roundtrip_ms\&quot;: 9.93445599999987, \&quot;seed\&quot;: 346874994, \&quot;trusted_baseline_ms\&quot;: 6.935711000000566}, {\&quot;candidate_adjusted_ms\&quot;: 6.587045999999042, \&quot;candidate_roundtrip_ms\&quot;: 14.734885999999392, \&quot;overhead_roundtrip_ms\&quot;: 8.14784000000035, \&quot;seed\&quot;: 346874995, \&quot;trusted_baseline_ms\&quot;: 6.699497999999693}, {\&quot;candidate_adjusted_ms\&quot;: 7.130799000000465, \&quot;candidate_roundtrip_ms\&quot;: 14.208828000000118, \&quot;overhead_roundtrip_ms\&quot;: 7.078028999999653, \&quot;seed\&quot;: 346874996, \&quot;trusted_baseline_ms\&quot;: 6.7527479999993645}], \&quot;trusted_baseline_samples_ms\&quot;: [6.935711000000566, 6.699497999999693, 6.7527479999993645]}, \&quot;baseline_count\&quot;: 111279790, \&quot;baseline_reps_ms\&quot;: [6.924420999999903, 6.688707999999544, 6.653752000000068], \&quot;candidate_count\&quot;: 111279790, \&quot;candidate_reps_ms\&quot;: [6.740183999999871, 6.914011000000109, 6.8279589999997725], \&quot;copies_per_rep\&quot;: true, \&quot;dataset\&quot;: \&quot;generated inside the worker from the seed; verified by sha256 digest\&quot;, \&quot;digest\&quot;: \&quot;3d93599ca651dc549bed51b59415f4782d1dd68777cf4933b11faed50740be83\&quot;, \&quot;expected_count\&quot;: 111279790, \&quot;limitations\&quot;: [\&quot;diagnostic worker timings are untrusted; selected score uses supervisor wall and a separate trusted baseline\&quot;, \&quot;candidate net timing subtracts noisy IPC/data-generation overhead; not a robust portable speedup\&quot;, \&quot;the root-side wall clock bounds that claim from outside but cannot fully isolate the candidate\&quot;, \&quot;single sandbox, single machine: not a portable benchmark claim\&quot;], \&quot;lower\&quot;: -346874993, \&quot;n\&quot;: 20000, \&quot;reps\&quot;: 3, \&quot;root_measurement\&quot;: {\&quot;baseline_net_ms\&quot;: 13.587751000000203, \&quot;baseline_wall_ms\&quot;: 20.737084000000294, \&quot;candidate_net_ms\&quot;: 14.051473000000314, \&quot;candidate_wall_ms\&quot;: 21.200806000000405, \&quot;method\&quot;: \&quot;root supervisor wall clock around each bench round trip, minus an identical overhead-only probe (which=&#x27;none&#x27;)\&quot;, \&quot;note\&quot;: \&quot;cross-check of the untrusted self-timing only: single-shot point estimates that include IPC, JSON and array-generation noise, not a statistical measure\&quot;, \&quot;overhead_wall_ms\&quot;: 7.149333000000091}, \&quot;seed\&quot;: 346874993, \&quot;statistic\&quot;: \&quot;median of 3 supervisor-measured distinct-dataset repetitions; candidate IPC overhead estimated by same-dataset null roundtrip\&quot;, \&quot;timed_where\&quot;: \&quot;authoritative: trusted supervisor wall; diagnostic *_reps_ms: inside untrusted worker\&quot;, \&quot;upper\&quot;: 256194574, \&quot;warmup\&quot;: 1, \&quot;worker_baseline_median_ms\&quot;: 6.688707999999544, \&quot;worker_candidate_median_ms\&quot;: 6.8279589999997725}, \&quot;benchmark_n\&quot;: 20000, \&quot;candidate_ms\&quot;: 6.587045999999042, \&quot;compile_ok\&quot;: true, \&quot;detail\&quot;: null, \&quot;elapsed_ms\&quot;: 350.54769200000015, \&quot;error_subtype\&quot;: null, \&quot;error_type\&quot;: \&quot;performance_met\&quot;, \&quot;errors\&quot;: [], \&quot;exception_type\&quot;: null, \&quot;phase\&quot;: \&quot;benchmark\&quot;, \&quot;protocol\&quot;: {\&quot;budget_s\&quot;: 20.0, \&quot;candidate_path\&quot;: \&quot;/workspace/candidate/solution.py\&quot;, \&quot;framing\&quot;: \&quot;newline-delimited JSON, one request object and one response object per line\&quot;, \&quot;output_caps_bytes\&quot;: {\&quot;max_line\&quot;: 4194304, \&quot;max_total\&quot;: 16777216}, \&quot;request_cap_bytes\&quot;: 16777216, \&quot;runs_as_user\&quot;: \&quot;nobody\&quot;, \&quot;spawn\&quot;: \&quot;runuser -u nobody -- env -i &lt;minimal env&gt; python3 -I worker.py\&quot;, \&quot;supervisor_imports_candidate\&quot;: false, \&quot;version\&quot;: 1, \&quot;worker_imports_candidate\&quot;: true, \&quot;worker_path\&quot;: \&quot;/workspace/.kiss_trusted/worker.py\&quot;}, \&quot;protocol_version\&quot;: 1, \&quot;seed\&quot;: 1729, \&quot;speedup\&quot;: 1.0251557374884503, \&quot;status\&quot;: \&quot;performance_met\&quot;, \&quot;supervisor_self_protect\&quot;: {\&quot;mode\&quot;: \&quot;0o400\&quot;, \&quot;path\&quot;: \&quot;/workspace/.kiss_trusted/harness.py\&quot;}, \&quot;tests_passed\&quot;: 60, \&quot;total\&quot;: 60, \&quot;worker\&quot;: {\&quot;numpy\&quot;: false, \&quot;pid\&quot;: null, \&quot;python\&quot;: \&quot;3.12.3\&quot;, \&quot;user\&quot;: \&quot;nobody\&quot;}}\n&quot;,
+    &quot;standard_error&quot;: &quot;harness status=performance_met phase=benchmark tests=60/60 elapsed=351ms\n&quot;,
+    &quot;exit_code&quot;: 0,
+    &quot;error_message&quot;: &quot;&quot;
+  }
+}</pre></details></article><section class="panel"><h2>Resource cleanup</h2><pre>[
+  {
+    &quot;sandbox_id&quot;: &quot;sb-01m55qffayewm116ph9f2ymhsp&quot;,
+    &quot;status&quot;: &quot;destroyed&quot;,
+    &quot;verified&quot;: true
+  },
+  {
+    &quot;sandbox_id&quot;: &quot;sb-01m55qf2t7vbfr2jd2z315mtf8&quot;,
+    &quot;status&quot;: &quot;destroyed&quot;,
+    &quot;verified&quot;: true
+  },
+  {
+    &quot;sandbox_id&quot;: &quot;sb-01m55qessrtxsccap1d6j0ntr8&quot;,
+    &quot;status&quot;: &quot;destroyed&quot;,
+    &quot;verified&quot;: true
+  }
+]</pre></section>
+<section class="panel"><h2>Run configuration</h2><pre>{
+  &quot;rounds&quot;: 2,
+  &quot;width&quot;: 1,
+  &quot;max_candidates&quot;: 2,
+  &quot;max_model_calls&quot;: 5,
+  &quot;max_sandboxes&quot;: 3,
+  &quot;search_seconds&quot;: 240,
+  &quot;benchmark_n&quot;: 20000,
+  &quot;seed&quot;: 1729,
+  &quot;stop_on_target&quot;: false
+}</pre></section></html>

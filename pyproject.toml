@@ -2,8 +2,14 @@
 name = "kiss-discovery-engine"
 version = "0.1.0"
 description = "Evidence-first experimental code search using Mercury and real CreateOS forks"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Cristóbal Muñoz" }]
 requires-python = ">=3.11"
 dependencies = ["createos-sandbox", "httpx", "python-dotenv"]
+
+[project.urls]
+Repository = "TODO"
 
 [project.scripts]
 kiss = "kiss_engine.cli:main"

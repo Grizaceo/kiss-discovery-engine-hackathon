@@ -1,59 +1,104 @@
 # KISS Discovery Engine
 
-Created 2026-10-17T16:26:36.417691-03:00. New event implementation informed by preparatory design, not copied from earlier KISS code. Local-only MVP, no payments.
+**An agent that writes code, runs every attempt in a real CreateOS microVM fork, and lets a trusted supervisor's tests decide.**
 
-**Mercury generates. Real microVM forks execute. Tests decide.**
+## In 30 seconds
 
-## Working MVP
+- **Problem:** Given `count_pairs(a: list[int], b: list[int], lower: int, upper: int) -> int`, count cross-list index pairs `(i, j)` with `lower <= a[i] + b[j] <= upper` (inclusive) across up to `10^6` integers in `±10^9` using only the Python 3 standard library and without mutating caller inputs.
+- **What KISS does:** Queries **Mercury 2.5** (Inception direct API) for distinct algorithms (`sorted-bisect`, `two-pointer`), validates the AST contract on the host without ever importing or executing candidate code locally, forks a paused **CreateOS Sandbox** microVM for each attempt, runs 60 hidden correctness tests plus 3×20,000-item benchmarks under a root-owned supervisor (`nobody` worker), pauses the winner, and forks the next revision directly from the winner's paused VM and measured feedback.
+- **Verified result:** Across 7 real runs (`34/34` owned CreateOS microVMs verified `destroyed`, `20,350` provider-reported tokens), `search-20261017T215022-01459f` completed a full 2-approach + own-parent revision chain (`60/60` on all 3 candidates, `4/4` VMs destroyed), and `search-20261017T200300-4a7d42` produced the only candidate faster than baseline beyond the 5% measurement noise band (`0.83× baseline`, root cross-check `agreement: true`).
 
-Generate alternative Python algorithms, evaluate each in a real CreateOS fork, select correctness before measured time, and revise the winner from its own code, feedback and paused VM. Logical code lineage and physical fork lineage are separate. Append-only events and standalone reports preserve code, failures, metrics, selection and cleanup.
+## How it works
+
+```mermaid
+flowchart LR
+    M["Mercury 2.5<br/>(Inception direct)"] -->|"JSON: approach, code, explanation"| O["Host Orchestrator<br/>(AST contract check only)"]
+    O -->|"create + upload harness + pause"| B[("Paused Base VM")]
+    B -->|"fork Gen 0 (g0-c0)"| V0["Child VM g0-c0<br/>root supervisor → nobody worker<br/>60 tests + 3×20k timing"]
+    B -->|"fork Gen 0 (g0-c1)"| V1["Child VM g0-c1<br/>root supervisor → nobody worker<br/>60 tests + 3×20k timing"]
+    V0 -->|"rank: correctness first,<br/>then supervisor median"| P[("Paused Winner VM<br/>(g0-c0)")]
+    V1 -->|"discarded"| D1["destroy verified"]
+    P -->|"parent code + measured feedback"| M
+    P -->|"physical fork Gen 1 (g1-c0)"| V2["Child VM g1-c0<br/>root supervisor → nobody worker<br/>60 tests + 3×20k timing"]
+```
+
+**Logical vs. physical lineage:** Logical code lineage tracks which parent candidate's source code and measured feedback were sent to Mercury (`parent_candidate_id`). Physical microVM lineage tracks which paused CreateOS sandbox was cloned via `pause -> paused -> fork` (`forked_from`, verified against the server response), so Generation 1+ executes inside a physical fork of its own logical parent's paused VM rather than the base VM.
+
+## Results
+
+Ratios compare supervisor-measured candidate median against the same-VM trusted reference baseline using a 5% empirical noise band (`NOISE_BAND = 0.05`, derived from identical-algorithm `sorted-bisect` runs measuring `0.973×–1.044×` across VMs):
+
+| Run / Artifact | What ran | Outcome & ratio vs. baseline (`speed_verdict`) | Cleanup |
+|---|---|---|---|
+| [`search-20261017T215022-01459f`](evidence/search-20261017T215022-01459f/report.html) | 2 initial approaches + 1 own-parent revision (`N=20000`) | `g0-c0` (`sorted-bisect`, 60/60): `0.97× baseline · parity within measurement noise` (`6.942 / 7.133 ms`, `agreement: false`)<br>`g0-c1` (`two-pointer`, 60/60): `1.35× baseline · slower` (`9.667 / 7.166 ms`, `agreement: true`)<br>`g1-c0` (`parent-feedback-revision`, 60/60): `0.89× baseline · parity within measurement noise` (`6.553 / 7.346 ms`, `agreement: false`; selected by rule, difference within noise) | `4/4` VMs destroyed |
+| [`search-20261017T200437-128ee8`](evidence/search-20261017T200437-128ee8/report.html) | 1 initial approach + 1 own-parent revision (`N=20000`) | Parent `g0-c0` (60/60, `0.98× baseline · parity`, `6.515 / 6.661 ms`) remained best; child `g1-c0` (60/60, `0.98× baseline · parity`, `6.587 / 6.753 ms`) was slower in raw ms and not selected | `3/3` VMs destroyed |
+| `search-20261017T200300-4a7d42` | 2 initial approaches + 1 revision attempt (`N=20000`) | `g0-c0` (`sorted-bisect`, 60/60): `1.04× baseline · parity` (`6.911 / 6.618 ms`, `agreement: true`)<br>`g0-c1` (`two-pointer`, 60/60): **`0.83× baseline · faster beyond the noise band`** (`5.678 / 6.828 ms`, `agreement: true`) — the only speed result outside the noise band.<br>`g1-c0`: `invalid_generation` (contract check rejected before VM fork; preserved) | `3/3` VMs destroyed |
+| `search-20261017T195122-af1869` | Early 2-approach + revision chain (historical worker-timed) | `g0-c0` (60/60) won Round 0; `g0-c1` failed (`test_failure`, `5/60`, preserved); `g1-c0` revised `g0-c0` (`60/60`, historical worker-only timing) | `4/4` VMs destroyed (confirmed by audit) |
+| [`fixtures-20261017T195514-b9747e`](evidence/fixtures-20261017T195514-b9747e/summary.json) | 5 hand-authored remote failure fixtures (not Mercury) | `5/5` classified as expected: `incorrect` → `test_failure`, `controlled-timeout` → `timeout`, `syntax-error` → `compilation_error`, `input-mutation` → `test_failure`, `timing-spoof` (`time.perf_counter` monkeypatch) → `protocol_error` | `6/6` VMs destroyed |
+| [`smoke-20261017T200218-804c8e`](evidence/smoke-20261017T200218-804c8e/summary.json) | Real CreateOS fork & network smoke | `pause -> paused -> fork` inheritance (`true`), post-fork filesystem independence (`true`), 2 children running concurrently while base paused, egress `pypi.org` `200` / `example.com` `URLError` | `3/3` VMs destroyed |
+| [`audit-20261017T215138-6151e4`](evidence/audit-20261017T215138-6151e4/summary.json) | Read-only reconciliation of all recorded sandbox IDs | **`34/34` owned sandboxes verified `destroyed` (`unresolved: []`)**; `20,350` provider-reported tokens across 16 Mercury calls (`prompt: 11,271`, `completion: 9,079`) | Read-only (`0` created) |
+
+## Try it without credentials
+
+Run the offline test suite (fakes only; no network calls, no host execution of generated/fixture code) and inspect the curated static evidence bundle:
 
 ```sh
 uv sync --locked --group dev
 uv run pytest -q
 uv run ruff check src tests
-uv run kiss serve --port 8097
 ```
 
-Open **http://127.0.0.1:8097**. One bounded real job at a time. Standalone reports: `runs/<run-id>/report.html`.
+Curated static artifacts (no credentials or running server required):
+- **Static evidence index (Deployed Project URL target):** [`evidence/index.html`](evidence/index.html)
+- **Primary 2-approach + revision standalone report:** [`evidence/search-20261017T215022-01459f/report.html`](evidence/search-20261017T215022-01459f/report.html)
+- **Contrast 1-width standalone report (parent stays ahead):** [`evidence/search-20261017T200437-128ee8/report.html`](evidence/search-20261017T200437-128ee8/report.html)
+- **Platform evidence JSONs & screenshots:** [`evidence/README.md`](evidence/README.md)
 
-## Credentials and stack
+## Run it for real
 
-The authorized Stripe Projects `setup` stack was reused with supported `stripe projects pull --skip-skills --yes`, without duplicate provisioning or plan changes. `.env` and `.projects/` stay ignored. On another machine inspect `stripe projects pull --help` and authorize/select your existing stack.
-
-Provide `CREATEOS_API_KEY` and `MERCURY_API_KEY` through the orchestrator environment or ignored `.env`; aliases are in `.env.example`. Optional `MERCURY_ENV_FILE` points to a separate private dotenv file. On this workstation the existing authorized Mercury file is loaded directly, never copied. Keys never go to guests or frontend. Missing credentials produce a visible error, not a simulation.
-
-## Commands
+Provide `CREATEOS_API_KEY` and `MERCURY_API_KEY` in the environment or a local ignored `.env` (see `.env.example`; optional `MERCURY_ENV_FILE` points to an external dotenv file). Keys stay in the host orchestrator and are never uploaded to guests or exposed in the UI.
 
 ```sh
-uv run kiss smoke
+# Loopback-only dashboard (http://127.0.0.1:8097):
+uv run kiss serve --port 8097
+
+# Bounded 2-round CLI search (capped at <=4 VMs, <=5 model calls, <=300s wall time):
 uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000
-# Smaller initial-candidate -> own-parent-revision chain:
-uv run kiss run --rounds 2 --width 1 --max-candidates 2 --max-sandboxes 3 --max-model-calls 5 --search-seconds 240 --benchmark-n 20000
-# Hand-authored remote failure fixtures, NOT Mercury output:
+
+# Smoke, failure fixtures, and read-only resource audit:
+uv run kiss smoke
 uv run kiss failures
-# Read-only reconciliation of only this repository's recorded resource IDs:
 uv run kiss audit
 ```
 
-Remote runs consume existing credits. Candidates, creations, rounds, model attempts and wall time are capped. Cleanup has separate finite bounds. Retries for 429, truncation and malformed content count against the same call budget and retain every attempt. No substitute model.
+Remote runs consume existing CreateOS and Inception credits. Every run enforces hard caps on rounds (`1..3`), width (`1..2`), candidates (`1..5`), model calls (`1..8`), sandboxes (`2..6`), and wall time (`30..600s`), followed by bounded `finally` cleanup.
 
-## Exact task
+## CreateOS + Stripe Projects
 
-`count_pairs(a: list[int], b: list[int], lower: int, upper: int) -> int` counts cross-list index pairs satisfying inclusive bounds. Duplicates count by index. Empty lists or `lower > upper` yield zero. Inputs must remain unchanged. Values within ±10^9; bounds within ±2×10^9; up to 10^6 items per list; standard library only. Finite demo tests do not prove every permitted input.
+| Layer / Primitive | How KISS uses it | Code / Verification reference |
+|---|---|---|
+| **CreateOS `create_sandbox`** | Creates `s-1vcpu-1gb` (`devbox:1`) base microVM with `ingress_enabled=False`, package-only `egress_rules` (`pypi.org:443`, `*.pythonhosted.org:443`), empty guest env (`{}`), and `auto_pause_after_seconds=120`. | `src/kiss_engine/runtime.py` (`Sandboxes.create`) |
+| **CreateOS `pause` → `paused`** | Pauses the base VM after installing the root-only harness (`chmod 444`), and pauses each round winner after killing any residual `nobody` processes (`pkill -KILL -u nobody`) before checkpointing. | `src/kiss_engine/runtime.py` (`Sandboxes.pause`), `src/kiss_engine/engine.py` |
+| **CreateOS `fork` (`forked_from`)** | Forks each candidate VM from a verified `paused` parent (`base` in Gen 0, the winning parent's paused VM in Gen 1+) and verifies `projection(box)["forked_from"] == parent.id` against the server response. | `src/kiss_engine/runtime.py:278-279` (`Sandboxes.fork`) |
+| **CreateOS `destroy` + read-back** | Resumes paused VMs before destroy when needed, calls `destroy()`, polls `wait(box, "destroyed")`, and logs `cleanup_verified`. Ambiguous create/fork errors trigger `reconcile()`. | `src/kiss_engine/runtime.py` (`Sandboxes.destroy`, `Sandboxes.cleanup`) |
+| **Read-only `kiss audit`** | Reads back every sandbox ID ever recorded in `runs/*/events.jsonl` via `client.get_sandbox(id)` without mutating state, plus aggregates provider token usage. | `src/kiss_engine/audit.py` (`34/34 destroyed` in `audit-20261017T215138-6151e4`) |
+| **Stripe Projects (`setup` stack)** | Reused the existing provisioned CreateOS project stack (`https://projects.dev/s#v1:createos~project`) via `stripe projects pull --skip-skills --yes` so no duplicate project or paid plan change was triggered. `.env` and `.projects/` remain gitignored. | `docs/PROVENANCE.md`, `.gitignore` |
 
-## Measurement and safety
+## Honest limits
 
-60 supervisor-checked tests; limited counterexamples, not the hidden suite, go to Mercury. Root-owned trusted harness and `nobody` worker inside each VM. Generated/fixture solutions are never imported or executed on the host. Worker PID data is never trusted for root process termination.
+- **Host & guest safety:** Candidate and fixture code is never imported or executed on the host (AST validation only). Inside each microVM, the root-owned supervisor (`/workspace/.kiss_trusted/harness.py`, mode `0400` while running) spawns an isolated `nobody` worker (`python3 -I`, 512 MiB address-space cap) and never trusts worker-reported PIDs for process termination. This is a practical separation boundary, not formal certification against deliberately hostile Python.
+- **Measurement noise:** Supervisor wall-clock timing subtracts a same-dataset null IPC roundtrip across 3 distinct 20,000-item datasets. Because IPC/data-generation subtraction has a ~5% noise band across VMs, raw `performance_met` (`candidate_ms <= baseline_ms`) is a finite-run threshold, not a portable speedup proof; reports and the dashboard explicitly label results as `faster beyond the noise band`, `parity within measurement noise`, or `slower`.
+- **Network & scope:** Package-host egress rules passed empirical positive (`pypi.org`) and negative (`example.com`) probes, not a universal firewall audit. Loopback UI (`127.0.0.1`) checks `Host` and `Origin`, HTML-escapes all model output, and never serves arbitrary files.
 
-Expected answers and baseline remain outside candidate Python. Three distinct measured datasets; supervisor wall time minus a same-dataset null roundtrip estimates candidate time. Internal worker times are diagnostic. Subtraction is noisy: `performance_met` is a finite-run threshold, **not statistically established or portable improvement**. The final child was slower; the parent honestly remained best. This is not certification against deliberately hostile Python.
+## Future work
 
-Before checkpointing, evaluation ends, unprivileged activity is killed/checked and transient artifacts removed. No secrets in guests; ingress disabled. Package-host egress passed positive/negative probes, not a universal deny-all audit. UI is loopback-only, validates Host/Origin, escapes model text and never serves arbitrary files.
+- **Paired parent/child timing in the child VM (K22):** Benchmark both parent and child solutions side-by-side inside the child microVM to eliminate cross-VM baseline drift.
+- **IPC-matched baseline, bootstrap CI, and ratio ranking (K23):** Run the reference baseline through the same worker IPC path with more repetitions and a bootstrap confidence interval, and rank candidates by ratio against their same-VM baseline instead of raw milliseconds.
+- **Multi-branch revision fan-out (K24):** Fork multiple distinct revision children in parallel from the same paused winning parent VM in Generation 1+.
+- **Concurrent generation and VM forks (K25):** Overlap Mercury API generation and CreateOS sandbox forks within each round's width budget.
+- **Deeper pre-checkpoint hygiene (K26):** Scrub `/tmp`, `/var/tmp`, and `/dev/shm` in addition to killing `nobody` processes and clearing `__pycache__` before pausing a winning VM.
+- **Compact revision feedback prompts (K27):** Trim verbose benchmark metadata from the parent feedback JSON sent to Mercury to reduce prompt tokens and truncation risk.
+- **Harder correctness & adversarial performance suite (K28):** Expand hidden tests with worst-case duplicate plateaus and adversarial distributions that separate $O((N+M)\log M)$ from $O(N\log N + M\log M)$.
+- **Broader remote failure fixtures (K29):** Add remote fixtures for memory-limit exhaustion (`MemoryError`), stdout flooding, and child-process spawning under `nobody`.
 
-## Evidence and handoff
-
-See [verification](docs/VERIFICATION.md), [demo](docs/DEMO.md), [decisions](docs/DECISIONS.md), [provenance](docs/PROVENANCE.md) and [state](STATE.md).
-
-Final two-approach chain `search-20261017T215022-01459f`: `g0-c0` (`sorted-bisect`, 60/60, `6.942 ms`) and `g0-c1` (`two-pointer`, 60/60, `9.667 ms`) forked from paused base; `g0-c0` selected as Round 0 parent; child `g1-c0` revised `g0-c0` from its own code/feedback inside a physical fork of `g0-c0`'s paused VM (`60/60`, `6.553 ms`, `4/4` sandboxes destroyed). Earlier chain `search-20261017T200437-128ee8` (`width=1`) shows parent `g0-c0` (`6.515 ms`) remaining ahead of child `g1-c0` (`6.587 ms`), illustrating finite-run timing noise. Run `search-20261017T195122-af1869` preserves a wrong initial solution (`5/60`) and a real revision under the historical worker-timed method. Audit `audit-20261017T215138-6151e4` read back **34/34 owned resources destroyed** (20,350 provider-reported tokens across 16 usage events; credit/currency cost not inferred). Raw evidence is private and ignored.
-
-**No public hosting, push or submission without permission.** Code **CreateOS-2026**. Both destinations: extra Discord deadline link and https://projects.dev/leaderboard. Internal target 21:45 Chile; deadline 22:00. Nothing submitted.
+See [`docs/VERIFICATION.md`](docs/VERIFICATION.md), [`docs/DEMO.md`](docs/DEMO.md), [`docs/DECISIONS.md`](docs/DECISIONS.md), [`docs/PROVENANCE.md`](docs/PROVENANCE.md), and [`STATE.md`](STATE.md).

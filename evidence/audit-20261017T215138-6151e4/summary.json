@@ -1,0 +1,836 @@
+{
+  "run_id": "audit-20261017T215138-6151e4",
+  "resources": [
+    {
+      "id": "sb-01m55pbazv7g9h0pntxtpbcedm",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:45:16.795063+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t194515-a16a3d",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "smoke-20261017T194515-a16a3d"
+      ]
+    },
+    {
+      "id": "sb-01m55pbn4ny0dwcnd8v9x5x1xq",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:45:27.189293+00:00",
+      "ingress_enabled": false,
+      "name": "amazing-ptolemy-6ajv",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pbazv7g9h0pntxtpbcedm",
+      "owner_runs": [
+        "smoke-20261017T194515-a16a3d"
+      ]
+    },
+    {
+      "id": "sb-01m55pc73a4ma55gk130ftjxqa",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:45:45.578144+00:00",
+      "ingress_enabled": false,
+      "name": "cool-darwin-815p",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pbazv7g9h0pntxtpbcedm",
+      "owner_runs": [
+        "smoke-20261017T194515-a16a3d"
+      ]
+    },
+    {
+      "id": "sb-01m55phb7q75hwrrwfzbrqpcz8",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:48:33.655721+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t194833-eb08f3",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T194833-eb08f3"
+      ]
+    },
+    {
+      "id": "sb-01m55phhx7bpym6c14bv2hmedv",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:48:40.487798+00:00",
+      "ingress_enabled": false,
+      "name": "agitated-boyd-xmcn",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55phb7q75hwrrwfzbrqpcz8",
+      "owner_runs": [
+        "search-20261017T194833-eb08f3"
+      ]
+    },
+    {
+      "id": "sb-01m55pmzbrzney3hvrxmt9s0he",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:50:32.568216+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t195032-8255bd",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "debug-harness-20261017T195032-8255bd"
+      ]
+    },
+    {
+      "id": "sb-01m55pnafj7g38ep0pbnsar8rm",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:50:43.954620+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t195043-2be8ff",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T195043-2be8ff"
+      ]
+    },
+    {
+      "id": "sb-01m55pnhqn4mbgb1wm52v7n6c3",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:50:51.381989+00:00",
+      "ingress_enabled": false,
+      "name": "hungry-pascal-bvi3",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pnafj7g38ep0pbnsar8rm",
+      "owner_runs": [
+        "search-20261017T195043-2be8ff"
+      ]
+    },
+    {
+      "id": "sb-01m55ppgtf521b968xfvsf3y9f",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:51:23.215126+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t195122-af1869",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T195122-af1869"
+      ]
+    },
+    {
+      "id": "sb-01m55ppsf6bhbfnaja4n468m43",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:51:32.070370+00:00",
+      "ingress_enabled": false,
+      "name": "beautiful-boyd-1c9w",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55ppgtf521b968xfvsf3y9f",
+      "owner_runs": [
+        "search-20261017T195122-af1869"
+      ]
+    },
+    {
+      "id": "sb-01m55pq6f79h26767h554q0j8p",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:51:45.383026+00:00",
+      "ingress_enabled": false,
+      "name": "keen-dhawan-fwhc",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55ppgtf521b968xfvsf3y9f",
+      "owner_runs": [
+        "search-20261017T195122-af1869"
+      ]
+    },
+    {
+      "id": "sb-01m55pqr1zkxzres22szctrr05",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:52:03.391907+00:00",
+      "ingress_enabled": false,
+      "name": "clever-hodgkin-stx0",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55ppsf6bhbfnaja4n468m43",
+      "owner_runs": [
+        "search-20261017T195122-af1869"
+      ]
+    },
+    {
+      "id": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:55:14.968455+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t195514-b9747e",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "fixtures-20261017T195514-b9747e"
+      ]
+    },
+    {
+      "id": "sb-01m55pxvcdmyacdj5hqq27vxqb",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:55:23.405908+00:00",
+      "ingress_enabled": false,
+      "name": "youthful-spence-yboh",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "owner_runs": [
+        "fixtures-20261017T195514-b9747e"
+      ]
+    },
+    {
+      "id": "sb-01m55py2fm19sn7q3bvymctpps",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:55:30.676873+00:00",
+      "ingress_enabled": false,
+      "name": "heuristic-swartz-jf33",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "owner_runs": [
+        "fixtures-20261017T195514-b9747e"
+      ]
+    },
+    {
+      "id": "sb-01m55pyfej6t8ncq1dsc6840xt",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:55:43.954447+00:00",
+      "ingress_enabled": false,
+      "name": "goofy-bardeen-qn7a",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "owner_runs": [
+        "fixtures-20261017T195514-b9747e"
+      ]
+    },
+    {
+      "id": "sb-01m55pym9j0n2z9qjee1zxm71j",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:55:48.914388+00:00",
+      "ingress_enabled": false,
+      "name": "festive-swartz-nu16",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "owner_runs": [
+        "fixtures-20261017T195514-b9747e"
+      ]
+    },
+    {
+      "id": "sb-01m55pys54e07rwmdybgvd8yr4",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:55:53.892092+00:00",
+      "ingress_enabled": false,
+      "name": "crazy-rubin-1n89",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "owner_runs": [
+        "fixtures-20261017T195514-b9747e"
+      ]
+    },
+    {
+      "id": "sb-01m55q4a6pr78xh1cv6wpn7jaf",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:58:55.190525+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t195854-92454c",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T195854-92454c"
+      ]
+    },
+    {
+      "id": "sb-01m55q4hpcxz1wfwpqtncmxz3a",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:59:02.860630+00:00",
+      "ingress_enabled": false,
+      "name": "crazy-wilbur-yxtq",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55q4a6pr78xh1cv6wpn7jaf",
+      "owner_runs": [
+        "search-20261017T195854-92454c"
+      ]
+    },
+    {
+      "id": "sb-01m55q555d73bky61q9zt5shch",
+      "status": "destroyed",
+      "created_at": "2026-10-17 19:59:22.797186+00:00",
+      "ingress_enabled": false,
+      "name": "great-cartwright-96ya",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55q4a6pr78xh1cv6wpn7jaf",
+      "owner_runs": [
+        "search-20261017T195854-92454c"
+      ]
+    },
+    {
+      "id": "sb-01m55qahfm54afp97wj093z9h8",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:02:19.252585+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t200218-804c8e",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "smoke-20261017T200218-804c8e"
+      ]
+    },
+    {
+      "id": "sb-01m55qapyg0xeegs0tjvx58tt5",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:02:24.848842+00:00",
+      "ingress_enabled": false,
+      "name": "hardcore-lumiere-x6it",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55qahfm54afp97wj093z9h8",
+      "owner_runs": [
+        "smoke-20261017T200218-804c8e"
+      ]
+    },
+    {
+      "id": "sb-01m55qb7kt6h0prj12jbbxmj56",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:02:41.914268+00:00",
+      "ingress_enabled": false,
+      "name": "wizardly-faraday-4q2p",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55qahfm54afp97wj093z9h8",
+      "owner_runs": [
+        "smoke-20261017T200218-804c8e"
+      ]
+    },
+    {
+      "id": "sb-01m55qbtjzghv00ng68y8da59s",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:03:01.343682+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t200300-4a7d42",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T200300-4a7d42"
+      ]
+    },
+    {
+      "id": "sb-01m55qc18bn0bjdcycvjmg4s60",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:03:08.171218+00:00",
+      "ingress_enabled": false,
+      "name": "friendly-raman-y3yx",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55qbtjzghv00ng68y8da59s",
+      "owner_runs": [
+        "search-20261017T200300-4a7d42"
+      ]
+    },
+    {
+      "id": "sb-01m55qcp9pd5rmqc6rvfj0e36z",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:03:29.718573+00:00",
+      "ingress_enabled": false,
+      "name": "fervent-antonelli-opl4",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55qbtjzghv00ng68y8da59s",
+      "owner_runs": [
+        "search-20261017T200300-4a7d42"
+      ]
+    },
+    {
+      "id": "sb-01m55qessrtxsccap1d6j0ntr8",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:04:38.840392+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t200437-128ee8",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T200437-128ee8"
+      ]
+    },
+    {
+      "id": "sb-01m55qf2t7vbfr2jd2z315mtf8",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:04:48.071740+00:00",
+      "ingress_enabled": false,
+      "name": "vibrant-margulis-gpuq",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55qessrtxsccap1d6j0ntr8",
+      "owner_runs": [
+        "search-20261017T200437-128ee8"
+      ]
+    },
+    {
+      "id": "sb-01m55qffayewm116ph9f2ymhsp",
+      "status": "destroyed",
+      "created_at": "2026-10-17 20:05:00.894886+00:00",
+      "ingress_enabled": false,
+      "name": "upbeat-rosalind-prkp",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55qf2t7vbfr2jd2z315mtf8",
+      "owner_runs": [
+        "search-20261017T200437-128ee8"
+      ]
+    },
+    {
+      "id": "sb-01m55xge5pz50x960atf55199r",
+      "status": "destroyed",
+      "created_at": "2026-10-17 21:50:23.926427+00:00",
+      "ingress_enabled": false,
+      "name": "kiss-017t215022-01459f",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "",
+      "owner_runs": [
+        "search-20261017T215022-01459f"
+      ]
+    },
+    {
+      "id": "sb-01m55xgnr1xme51d4bab9bnnvs",
+      "status": "destroyed",
+      "created_at": "2026-10-17 21:50:31.681349+00:00",
+      "ingress_enabled": false,
+      "name": "naughty-sinoussi-gi1f",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55xge5pz50x960atf55199r",
+      "owner_runs": [
+        "search-20261017T215022-01459f"
+      ]
+    },
+    {
+      "id": "sb-01m55xh7htvnf8cgee3gxfwqds",
+      "status": "destroyed",
+      "created_at": "2026-10-17 21:50:49.914091+00:00",
+      "ingress_enabled": false,
+      "name": "crazy-bartik-627v",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55xge5pz50x960atf55199r",
+      "owner_runs": [
+        "search-20261017T215022-01459f"
+      ]
+    },
+    {
+      "id": "sb-01m55xhp139bt4r3m2hjq99ewz",
+      "status": "destroyed",
+      "created_at": "2026-10-17 21:51:04.739339+00:00",
+      "ingress_enabled": false,
+      "name": "jovial-saha-uoa2",
+      "shape": "s-1vcpu-1gb",
+      "rootfs": "devbox:1",
+      "egress_rules": [
+        "pypi.org:443",
+        "*.pythonhosted.org:443"
+      ],
+      "forked_from": "sb-01m55xgnr1xme51d4bab9bnnvs",
+      "owner_runs": [
+        "search-20261017T215022-01459f"
+      ]
+    }
+  ],
+  "owned_count": 34,
+  "destroyed_count": 34,
+  "unresolved": [],
+  "usage_events": 16,
+  "provider_reported_tokens": {
+    "prompt_tokens": 11271,
+    "completion_tokens": 9079,
+    "total_tokens": 20350
+  },
+  "cost": "Not inferred: account credits/currency usage unavailable in these responses.",
+  "model_usage_records": [
+    {
+      "run_id": "search-20261017T194833-eb08f3",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 267,
+        "completion_tokens": 335,
+        "total_tokens": 602,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 117
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195043-2be8ff",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 271,
+        "completion_tokens": 416,
+        "total_tokens": 687,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 175
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195122-af1869",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 271,
+        "completion_tokens": 827,
+        "total_tokens": 1098,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 446
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195122-af1869",
+      "candidate_id": "g0-c1",
+      "usage": {
+        "prompt_tokens": 269,
+        "completion_tokens": 543,
+        "total_tokens": 812,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 285
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195122-af1869",
+      "candidate_id": "g1-c0",
+      "usage": {
+        "prompt_tokens": 1178,
+        "completion_tokens": 463,
+        "total_tokens": 1641,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 133
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195854-92454c",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 285,
+        "completion_tokens": 501,
+        "total_tokens": 786,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 168
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195854-92454c",
+      "candidate_id": "g0-c1",
+      "usage": {
+        "prompt_tokens": 285,
+        "completion_tokens": 459,
+        "total_tokens": 744,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 212
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T195854-92454c",
+      "candidate_id": "g1-c0",
+      "usage": {
+        "prompt_tokens": 1669,
+        "completion_tokens": 2396,
+        "total_tokens": 4065,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2231
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T200300-4a7d42",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 287,
+        "completion_tokens": 371,
+        "total_tokens": 658,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 132
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T200300-4a7d42",
+      "candidate_id": "g0-c1",
+      "usage": {
+        "prompt_tokens": 281,
+        "completion_tokens": 374,
+        "total_tokens": 655,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 74
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T200300-4a7d42",
+      "candidate_id": "g1-c0",
+      "usage": {
+        "prompt_tokens": 1748,
+        "completion_tokens": 303,
+        "total_tokens": 2051,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 301
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T200437-128ee8",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 275,
+        "completion_tokens": 407,
+        "total_tokens": 682,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 205
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T200437-128ee8",
+      "candidate_id": "g1-c0",
+      "usage": {
+        "prompt_tokens": 1690,
+        "completion_tokens": 519,
+        "total_tokens": 2209,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 152
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T215022-01459f",
+      "candidate_id": "g0-c0",
+      "usage": {
+        "prompt_tokens": 503,
+        "completion_tokens": 421,
+        "total_tokens": 924,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T215022-01459f",
+      "candidate_id": "g0-c1",
+      "usage": {
+        "prompt_tokens": 278,
+        "completion_tokens": 397,
+        "total_tokens": 675,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 139
+        }
+      }
+    },
+    {
+      "run_id": "search-20261017T215022-01459f",
+      "candidate_id": "g1-c0",
+      "usage": {
+        "prompt_tokens": 1714,
+        "completion_tokens": 347,
+        "total_tokens": 2061,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 116
+        }
+      }
+    }
+  ],
+  "read_only": true
+}

@@ -1,0 +1,40 @@
+{
+  "run_id": "smoke-20261017T200218-804c8e",
+  "path": "runs/smoke-20261017T200218-804c8e",
+  "ok": true,
+  "base_id": "sb-01m55qahfm54afp97wj093z9h8",
+  "child_ids": [
+    "sb-01m55qapyg0xeegs0tjvx58tt5",
+    "sb-01m55qb7kt6h0prj12jbbxmj56"
+  ],
+  "inheritance_verified": true,
+  "independence_verified": true,
+  "concurrent_running_observed": 2,
+  "egress": {
+    "https://pypi.org/simple/": {
+      "reachable": true,
+      "status": 200
+    },
+    "https://example.com/": {
+      "reachable": false,
+      "error_type": "URLError"
+    }
+  },
+  "cleanup": [
+    {
+      "sandbox_id": "sb-01m55qb7kt6h0prj12jbbxmj56",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55qapyg0xeegs0tjvx58tt5",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55qahfm54afp97wj093z9h8",
+      "status": "destroyed",
+      "verified": true
+    }
+  ]
+}

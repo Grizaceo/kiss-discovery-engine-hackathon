@@ -1,0 +1,369 @@
+{
+  "run_id": "fixtures-20261017T195514-b9747e",
+  "kind": "explicit test fixtures, not Mercury",
+  "ok": true,
+  "results": [
+    {
+      "fixture": "incorrect",
+      "expected": "test_failure",
+      "actual": "test_failure",
+      "ok": true,
+      "sandbox_id": "sb-01m55pxvcdmyacdj5hqq27vxqb",
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "feedback": {
+        "baseline_ms": null,
+        "benchmark": null,
+        "benchmark_n": 5000,
+        "candidate_ms": null,
+        "compile_ok": true,
+        "detail": "46 of 60 correctness tests disagree with the trusted brute-force reference",
+        "elapsed_ms": 62.939689999999885,
+        "error_subtype": null,
+        "error_type": "test_failure",
+        "errors": [
+          {
+            "candidate_error": null,
+            "case": {
+              "a": [
+                0
+              ],
+              "b": [
+                0
+              ],
+              "index": 3,
+              "lower": 0,
+              "upper": 0
+            },
+            "expected": 1,
+            "got": 0
+          },
+          {
+            "candidate_error": null,
+            "case": {
+              "a": [
+                5,
+                5,
+                5
+              ],
+              "b": [
+                5,
+                5
+              ],
+              "index": 6,
+              "lower": 10,
+              "upper": 10
+            },
+            "expected": 6,
+            "got": 0
+          }
+        ],
+        "exception_type": null,
+        "phase": "correctness",
+        "protocol": {
+          "budget_s": 20.0,
+          "candidate_path": "/workspace/candidate/solution.py",
+          "framing": "newline-delimited JSON, one request object and one response object per line",
+          "output_caps_bytes": {
+            "max_line": 4194304,
+            "max_total": 16777216
+          },
+          "request_cap_bytes": 16777216,
+          "runs_as_user": "nobody",
+          "spawn": "runuser -u nobody -- env -i <minimal env> python3 -I worker.py",
+          "supervisor_imports_candidate": false,
+          "version": 1,
+          "worker_imports_candidate": true,
+          "worker_path": "/workspace/.kiss_trusted/worker.py"
+        },
+        "protocol_version": 1,
+        "seed": 1730,
+        "speedup": null,
+        "status": "test_failure",
+        "supervisor_self_protect": {
+          "mode": "0o400",
+          "path": "/workspace/.kiss_trusted/harness.py"
+        },
+        "tests_passed": 14,
+        "total": 60,
+        "worker": {
+          "numpy": false,
+          "pid": null,
+          "python": "3.12.3",
+          "user": "nobody"
+        }
+      }
+    },
+    {
+      "fixture": "controlled-timeout",
+      "expected": "timeout",
+      "actual": "timeout",
+      "ok": true,
+      "sandbox_id": "sb-01m55py2fm19sn7q3bvymctpps",
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "feedback": {
+        "baseline_ms": null,
+        "benchmark": null,
+        "benchmark_n": 5000,
+        "candidate_ms": null,
+        "compile_ok": true,
+        "detail": "worker produced no output before its deadline",
+        "elapsed_ms": 6065.662869999999,
+        "error_subtype": null,
+        "error_type": "timeout",
+        "errors": [],
+        "exception_type": null,
+        "phase": "correctness",
+        "protocol": {
+          "budget_s": 20.0,
+          "candidate_path": "/workspace/candidate/solution.py",
+          "framing": "newline-delimited JSON, one request object and one response object per line",
+          "output_caps_bytes": {
+            "max_line": 4194304,
+            "max_total": 16777216
+          },
+          "request_cap_bytes": 16777216,
+          "runs_as_user": "nobody",
+          "spawn": "runuser -u nobody -- env -i <minimal env> python3 -I worker.py",
+          "supervisor_imports_candidate": false,
+          "version": 1,
+          "worker_imports_candidate": true,
+          "worker_path": "/workspace/.kiss_trusted/worker.py"
+        },
+        "protocol_version": 1,
+        "seed": 1730,
+        "speedup": null,
+        "status": "timeout",
+        "supervisor_self_protect": {
+          "mode": "0o400",
+          "path": "/workspace/.kiss_trusted/harness.py"
+        },
+        "tests_passed": 0,
+        "total": 60,
+        "worker": {
+          "numpy": false,
+          "pid": null,
+          "python": "3.12.3",
+          "user": "nobody"
+        }
+      }
+    },
+    {
+      "fixture": "syntax-error",
+      "expected": "compilation_error",
+      "actual": "compilation_error",
+      "ok": true,
+      "sandbox_id": "sb-01m55pyfej6t8ncq1dsc6840xt",
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "feedback": {
+        "baseline_ms": null,
+        "benchmark": null,
+        "benchmark_n": 5000,
+        "candidate_ms": null,
+        "compile_ok": false,
+        "detail": "SyntaxError: invalid syntax (line 1)",
+        "elapsed_ms": 46.49414000000007,
+        "error_subtype": "syntax_error",
+        "error_type": "compilation_error",
+        "errors": [],
+        "exception_type": "SyntaxError",
+        "phase": "startup",
+        "protocol": {
+          "budget_s": 20.0,
+          "candidate_path": "/workspace/candidate/solution.py",
+          "framing": "newline-delimited JSON, one request object and one response object per line",
+          "output_caps_bytes": {
+            "max_line": 4194304,
+            "max_total": 16777216
+          },
+          "request_cap_bytes": 16777216,
+          "runs_as_user": "nobody",
+          "spawn": "runuser -u nobody -- env -i <minimal env> python3 -I worker.py",
+          "supervisor_imports_candidate": false,
+          "version": 1,
+          "worker_imports_candidate": true,
+          "worker_path": "/workspace/.kiss_trusted/worker.py"
+        },
+        "protocol_version": 1,
+        "seed": 1730,
+        "speedup": null,
+        "status": "compilation_error",
+        "supervisor_self_protect": {
+          "mode": "0o400",
+          "path": "/workspace/.kiss_trusted/harness.py"
+        },
+        "tests_passed": 0,
+        "total": 60,
+        "worker": null
+      }
+    },
+    {
+      "fixture": "input-mutation",
+      "expected": "test_failure",
+      "actual": "test_failure",
+      "ok": true,
+      "sandbox_id": "sb-01m55pym9j0n2z9qjee1zxm71j",
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "feedback": {
+        "baseline_ms": null,
+        "benchmark": null,
+        "benchmark_n": 5000,
+        "candidate_ms": null,
+        "compile_ok": true,
+        "detail": "60 of 60 correctness tests disagree with the trusted brute-force reference",
+        "elapsed_ms": 63.6416099999999,
+        "error_subtype": null,
+        "error_type": "test_failure",
+        "errors": [
+          {
+            "candidate_error": "ValueError: candidate mutated caller inputs",
+            "case": {
+              "a": [],
+              "b": [],
+              "index": 0,
+              "lower": 0,
+              "upper": 0
+            },
+            "expected": 0,
+            "got": null
+          },
+          {
+            "candidate_error": "ValueError: candidate mutated caller inputs",
+            "case": {
+              "a": [],
+              "b": [
+                1,
+                2,
+                3
+              ],
+              "index": 1,
+              "lower": -10,
+              "upper": 10
+            },
+            "expected": 0,
+            "got": null
+          }
+        ],
+        "exception_type": null,
+        "phase": "correctness",
+        "protocol": {
+          "budget_s": 20.0,
+          "candidate_path": "/workspace/candidate/solution.py",
+          "framing": "newline-delimited JSON, one request object and one response object per line",
+          "output_caps_bytes": {
+            "max_line": 4194304,
+            "max_total": 16777216
+          },
+          "request_cap_bytes": 16777216,
+          "runs_as_user": "nobody",
+          "spawn": "runuser -u nobody -- env -i <minimal env> python3 -I worker.py",
+          "supervisor_imports_candidate": false,
+          "version": 1,
+          "worker_imports_candidate": true,
+          "worker_path": "/workspace/.kiss_trusted/worker.py"
+        },
+        "protocol_version": 1,
+        "seed": 1730,
+        "speedup": null,
+        "status": "test_failure",
+        "supervisor_self_protect": {
+          "mode": "0o400",
+          "path": "/workspace/.kiss_trusted/harness.py"
+        },
+        "tests_passed": 0,
+        "total": 60,
+        "worker": {
+          "numpy": false,
+          "pid": null,
+          "python": "3.12.3",
+          "user": "nobody"
+        }
+      }
+    },
+    {
+      "fixture": "timing-spoof",
+      "expected": "protocol_error",
+      "actual": "protocol_error",
+      "ok": true,
+      "sandbox_id": "sb-01m55pys54e07rwmdybgvd8yr4",
+      "forked_from": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "feedback": {
+        "baseline_ms": null,
+        "benchmark": null,
+        "benchmark_n": 5000,
+        "candidate_ms": null,
+        "compile_ok": true,
+        "detail": "worker timing samples must be finite and strictly positive",
+        "elapsed_ms": 90.69650399999985,
+        "error_subtype": null,
+        "error_type": "protocol_error",
+        "errors": [],
+        "exception_type": null,
+        "phase": "benchmark",
+        "protocol": {
+          "budget_s": 20.0,
+          "candidate_path": "/workspace/candidate/solution.py",
+          "framing": "newline-delimited JSON, one request object and one response object per line",
+          "output_caps_bytes": {
+            "max_line": 4194304,
+            "max_total": 16777216
+          },
+          "request_cap_bytes": 16777216,
+          "runs_as_user": "nobody",
+          "spawn": "runuser -u nobody -- env -i <minimal env> python3 -I worker.py",
+          "supervisor_imports_candidate": false,
+          "version": 1,
+          "worker_imports_candidate": true,
+          "worker_path": "/workspace/.kiss_trusted/worker.py"
+        },
+        "protocol_version": 1,
+        "seed": 1730,
+        "speedup": null,
+        "status": "protocol_error",
+        "supervisor_self_protect": {
+          "mode": "0o400",
+          "path": "/workspace/.kiss_trusted/harness.py"
+        },
+        "tests_passed": 60,
+        "total": 60,
+        "worker": {
+          "numpy": false,
+          "pid": null,
+          "python": "3.12.3",
+          "user": "nobody"
+        }
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "sandbox_id": "sb-01m55pys54e07rwmdybgvd8yr4",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55pym9j0n2z9qjee1zxm71j",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55pyfej6t8ncq1dsc6840xt",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55py2fm19sn7q3bvymctpps",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55pxvcdmyacdj5hqq27vxqb",
+      "status": "destroyed",
+      "verified": true
+    },
+    {
+      "sandbox_id": "sb-01m55pxk4r3qzxhv0cksa4mydp",
+      "status": "destroyed",
+      "verified": true
+    }
+  ]
+}
