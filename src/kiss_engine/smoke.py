@@ -12,6 +12,13 @@ def checked(adapter, box, command, args=None, timeout=40):
     return result["standard_output"]
 
 
+def expect(actual, wanted, what):
+    if actual != wanted:
+        raise RuntimeError(
+            f"Smoke check failed ({what}): expected {wanted!r}, got {actual!r}"
+        )
+
+
 def smoke():
     ledger = Ledger("smoke")
     secrets = load_secrets()
@@ -41,23 +48,24 @@ def smoke():
             inherited = checked(
                 adapter, child1, "cat", ["/workspace/marker.txt"]
             ).strip()
-            assert inherited == "base-marker", inherited
+            expect(inherited, "base-marker", "child1 inherited marker")
             checked(
                 adapter,
                 child1,
                 "sh",
                 ["-c", "printf child-marker > /workspace/marker.txt"],
             )
-            assert (
-                checked(adapter, child1, "cat", ["/workspace/marker.txt"]).strip()
-                == "child-marker"
+            expect(
+                checked(adapter, child1, "cat", ["/workspace/marker.txt"]).strip(),
+                "child-marker",
+                "child1 modified marker",
             )
             adapter.pause(child1)
             adapter.resume(base)
             parent_after = checked(
                 adapter, base, "cat", ["/workspace/marker.txt"]
             ).strip()
-            assert parent_after == "base-marker", parent_after
+            expect(parent_after, "base-marker", "base marker unaffected by child1")
             adapter.pause(base)
             child2 = adapter.fork(base)
             adapter.resume(child1)
@@ -68,9 +76,10 @@ def smoke():
             ledger.event(
                 "two_children_running", children=concurrent, base=projection(base)
             )
-            assert (
-                checked(adapter, child2, "cat", ["/workspace/marker.txt"]).strip()
-                == "base-marker"
+            expect(
+                checked(adapter, child2, "cat", ["/workspace/marker.txt"]).strip(),
+                "base-marker",
+                "child2 inherited base marker",
             )
             probe = checked(
                 adapter,

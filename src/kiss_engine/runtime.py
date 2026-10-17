@@ -23,10 +23,6 @@ from createos import (
 )
 from dotenv import dotenv_values
 
-PRIVATE_MERCURY = Path(
-    "/home/gris96/.hermes/workspace/ACTIVE/hackathon-createos-stripe-20261017/.env.mercury"
-)
-
 
 def utcnow():
     return datetime.now(UTC).isoformat()
@@ -34,9 +30,8 @@ def utcnow():
 
 def load_secrets():
     local = dotenv_values(Path.cwd() / ".env")
-    mercury = dotenv_values(
-        Path(os.environ.get("MERCURY_ENV_FILE", str(PRIVATE_MERCURY)))
-    )
+    mercury_file = os.environ.get("MERCURY_ENV_FILE") or local.get("MERCURY_ENV_FILE")
+    mercury = dotenv_values(Path(mercury_file).expanduser()) if mercury_file else {}
 
     def pick(*names):
         return next(

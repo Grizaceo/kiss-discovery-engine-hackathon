@@ -10,8 +10,9 @@ import pytest
 from kiss_engine.engine import Limits, rank
 from kiss_engine.harness import build_harness, extract_worker_source, parse_result
 from kiss_engine.mercury import GenerationError, Mercury, validate_code
-from kiss_engine.report import render_report
-from kiss_engine.runtime import Ledger, Sandboxes
+from kiss_engine.report import render_report, speed_verdict
+from kiss_engine.runtime import Ledger, Sandboxes, load_secrets
+from kiss_engine.smoke import expect
 from kiss_engine.web import list_runs
 
 FAKE_CODE = "def count_pairs(a,b,lower,upper):\n    return 0\n"
@@ -626,3 +627,66 @@ def test_live_selection_event_with_failing_parent_does_not_set_best(tmp_path):
     rows = list_runs(tmp_path)
     assert rows[0]["best_candidate_id"] is None
     assert rows[0]["revision_parent_id"] == "g0-c0"
+
+
+def test_speed_verdict_noise_band_and_real_run_ratios():
+    # 215022 g1-c0: 6.553484 / 7.346338 = 0.892x, agreement=False -> parity
+    f_215022_g1c0 = {
+        "candidate_ms": 6.553484,
+        "baseline_ms": 7.346338,
+        "benchmark": {"agreement": False},
+    }
+    assert (
+        speed_verdict(f_215022_g1c0)
+        == "0.89× baseline · parity within measurement noise"
+    )
+    # 200300 g0-c1: 5.678 / 6.828 = 0.832x, agreement=True -> faster beyond the noise band
+    f_200300_g0c1 = {
+        "candidate_ms": 5.678,
+        "baseline_ms": 6.828,
+        "benchmark": {"agreement": True},
+    }
+    assert (
+        speed_verdict(f_200300_g0c1) == "0.83× baseline · faster beyond the noise band"
+    )
+    # 215022 g0-c1: 9.666881 / 7.165880 = 1.349x -> slower
+    f_215022_g0c1 = {
+        "candidate_ms": 9.666881,
+        "baseline_ms": 7.165880,
+        "benchmark": {"agreement": True},
+    }
+    assert speed_verdict(f_215022_g0c1) == "1.35× baseline · slower"
+    assert speed_verdict({}) == "not benchmarked"
+
+
+def test_load_secrets_uses_mercury_env_file_without_hardcoded_path(
+    tmp_path, monkeypatch
+):
+    monkeypatch.chdir(tmp_path)
+    for var in (
+        "CREATEOS_API_KEY",
+        "CREATEOS_PROJECT_API_KEY",
+        "CREATEOS_PLAN_API_KEY",
+        "MERCURY_API_KEY",
+        "INCEPTION_API_KEY",
+        "MERCURY_ENV_FILE",
+    ):
+        monkeypatch.delenv(var, raising=False)
+    (tmp_path / ".env").write_text("CREATEOS_API_KEY=FAKE_CREATEOS_LOCAL\n")
+    with pytest.raises(RuntimeError, match="Missing credential"):
+        load_secrets()
+    ext_mercury = tmp_path / "external.mercury.env"
+    ext_mercury.write_text("MERCURY_API_KEY=FAKE_MERCURY_EXT\n")
+    (tmp_path / ".env").write_text(
+        f"CREATEOS_API_KEY=FAKE_CREATEOS_LOCAL\nMERCURY_ENV_FILE={ext_mercury}\n"
+    )
+    assert load_secrets() == {
+        "createos": "FAKE_CREATEOS_LOCAL",
+        "mercury": "FAKE_MERCURY_EXT",
+    }
+
+
+def test_smoke_expect_raises_runtime_error():
+    expect("base-marker", "base-marker", "marker check")
+    with pytest.raises(RuntimeError, match="Smoke check failed"):
+        expect("wrong", "base-marker", "marker check")

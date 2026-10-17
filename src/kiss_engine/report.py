@@ -17,6 +17,34 @@ STOP_NOTES = {
 }
 
 
+# In runs 200300, 200437 and 215022, g0-c0 (sorted-bisect, same approach as baseline)
+# measured 0.973x-1.044x, and baseline varied 6.618-7.346 ms across VMs (~5% noise band).
+NOISE_BAND = 0.05
+
+
+def speed_verdict(f):
+    f = f or {}
+    c, b = f.get("candidate_ms"), f.get("baseline_ms")
+    if not (
+        isinstance(c, (int, float))
+        and not isinstance(c, bool)
+        and isinstance(b, (int, float))
+        and not isinstance(b, bool)
+        and math.isfinite(c)
+        and math.isfinite(b)
+        and c > 0
+        and b > 0
+    ):
+        return "not benchmarked"
+    ratio = c / b
+    agree = (f.get("benchmark") or {}).get("agreement")
+    if ratio > 1 + NOISE_BAND:
+        return f"{ratio:.2f}× baseline · slower"
+    if ratio < 1 - NOISE_BAND and agree:
+        return f"{ratio:.2f}× baseline · faster beyond the noise band"
+    return f"{ratio:.2f}× baseline · parity within measurement noise"
+
+
 def _fmt_ms(val):
     if isinstance(val, (int, float)) and math.isfinite(val):
         return f"{val:.3f} ms (raw: {val})"
@@ -110,6 +138,13 @@ def render_report(summary):
         is_best = bool(
             summary.get("best_candidate_id") and cid == summary.get("best_candidate_id")
         )
+        sv = speed_verdict(f)
+        is_faster = "faster beyond the noise band" in sv
+        speed_badge = (
+            f' <span class="badge{" faster" if is_faster else ""}">{h(sv)}</span>'
+            if sv != "not benchmarked"
+            else ""
+        )
         winner_badge = (
             ' <span class="badge winner">SELECTED WINNER</span>' if is_best else ""
         )
@@ -150,9 +185,9 @@ def render_report(summary):
             if explanation
             else ""
         )
-        cards.append(f"""<article class="candidate{" best-card" if is_best else ""}"><header><h2>{h(cid)} <span class="badge {h(c.get("status", ""))}">{h(c.get("status", ""))}</span>{winner_badge}</h2>
+        cards.append(f"""<article class="candidate{" best-card" if is_best else ""}"><header><h2>{h(cid)} <span class="badge {h(c.get("status", ""))}">{h(c.get("status", ""))}</span>{speed_badge}{winner_badge}</h2>
 <p>Code parent: <b>{h(parent_id or "∅ (initial)")}</b> → <b>{h(cid)}</b> · {h(gen_desc)}</p></header>
-<dl><dt>Approach</dt><dd>{h(c.get("approach", c.get("requested_approach")))}</dd><dt>Physical microVM &amp; fork</dt><dd>{h(vm_desc)}</dd><dt>Source SHA256</dt><dd>{h(c.get("code_sha256") or "—")}</dd><dt>Correctness tests</dt><dd>{h(f.get("tests_passed", "—"))}/{h(f.get("total", "—"))} (phase: {h(f.get("phase") or "—")})</dd><dt>Candidate / baseline median</dt><dd>{h(_fmt_ms(f.get("candidate_ms")))} / {h(_fmt_ms(f.get("baseline_ms")))}</dd><dt>Timing methodology</dt><dd>{h(_timing_method(f))}</dd><dt>Generation / evaluation wall</dt><dd>{h(_fmt_ms(c.get("generation_ms")))} / {h(_fmt_ms(c.get("evaluation_wall_ms")))}</dd><dt>Selection outcome</dt><dd>{h(_selection_text(c, summary))}</dd>{exp_block}{err_block}</dl>
+<dl><dt>Approach</dt><dd>{h(c.get("approach", c.get("requested_approach")))}</dd><dt>Physical microVM &amp; fork</dt><dd>{h(vm_desc)}</dd><dt>Source SHA256</dt><dd>{h(c.get("code_sha256") or "—")}</dd><dt>Correctness tests</dt><dd>{h(f.get("tests_passed", "—"))}/{h(f.get("total", "—"))} (phase: {h(f.get("phase") or "—")})</dd><dt>Candidate / baseline median</dt><dd>{h(_fmt_ms(f.get("candidate_ms")))} / {h(_fmt_ms(f.get("baseline_ms")))} · <b>{h(sv)}</b></dd><dt>Timing methodology</dt><dd>{h(_timing_method(f))}</dd><dt>Generation / evaluation wall</dt><dd>{h(_fmt_ms(c.get("generation_ms")))} / {h(_fmt_ms(c.get("evaluation_wall_ms")))}</dd><dt>Selection outcome</dt><dd>{h(_selection_text(c, summary))}</dd>{exp_block}{err_block}</dl>
 <details open><summary>Code · actual provider response</summary><pre><code>{h(code)}</code></pre></details>
 <details><summary>Feedback, methodology and raw execution</summary><pre>{h(json.dumps({"feedback": f, "execution": c.get("execution")}, indent=2))}</pre></details></article>""")
     code_tree = "".join(
@@ -166,7 +201,7 @@ def render_report(summary):
         for c in summary.get("candidates", [])
     )
     return f"""<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KISS · {h(summary["run_id"])}</title>
-<style>:root{{color-scheme:dark}}body{{font:15px/1.55 system-ui;background:#0e1117;color:#e6edf3;max-width:1120px;margin:36px auto;padding:0 24px}}h1{{font-size:34px;margin-bottom:4px}}h2{{margin-top:0}}.subtitle,dt{{color:#9eacbb}}header p{{font-size:13px;color:#9eacbb}}article,.panel{{background:#151b23;border:1px solid #303b49;border-radius:14px;padding:22px;margin:18px 0}}.best-card{{border-color:#2ea043}}dl{{display:grid;grid-template-columns:230px 1fr;gap:9px}}dd{{margin:0;overflow-wrap:anywhere}}pre{{background:#0c1119;padding:16px;overflow:auto;font:12px/1.6 monospace;max-height:600px;border-radius:8px}}.badge{{font-size:12px;background:#333e50;padding:4px 9px;border-radius:12px;display:inline-block}}.correct,.performance_met,.winner{{background:#114932;color:#a0f0be}}.live{{background:#5a3e0b;color:#ffd885}}.err{{color:#ffac9c}}summary{{cursor:pointer;padding:8px 0;font-weight:600}}a{{color:#79c0ff}}.cols{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}@media(max-width:760px){{.cols,dl{{grid-template-columns:1fr}}}}</style>
+<style>:root{{color-scheme:dark}}body{{font:15px/1.55 system-ui;background:#0e1117;color:#e6edf3;max-width:1120px;margin:36px auto;padding:0 24px}}h1{{font-size:34px;margin-bottom:4px}}h2{{margin-top:0}}.subtitle,dt{{color:#9eacbb}}header p{{font-size:13px;color:#9eacbb}}article,.panel{{background:#151b23;border:1px solid #303b49;border-radius:14px;padding:22px;margin:18px 0}}.best-card{{border-color:#2ea043}}dl{{display:grid;grid-template-columns:230px 1fr;gap:9px}}dd{{margin:0;overflow-wrap:anywhere}}pre{{background:#0c1119;padding:16px;overflow:auto;font:12px/1.6 monospace;max-height:600px;border-radius:8px}}.badge{{font-size:12px;background:#333e50;padding:4px 9px;border-radius:12px;display:inline-block}}.correct,.faster,.winner{{background:#114932;color:#a0f0be}}.live{{background:#5a3e0b;color:#ffd885}}.err{{color:#ffac9c}}summary{{cursor:pointer;padding:8px 0;font-weight:600}}a{{color:#79c0ff}}.cols{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}@media(max-width:760px){{.cols,dl{{grid-template-columns:1fr}}}}</style>
 <p><a href="/">← Back to local experiment ledger</a></p>
 <h1>KISS Discovery Engine</h1><p class="subtitle">Evidence, not confidence. Mercury 2.5 · Inception direct · real CreateOS microVM forks.</p>
 <section class="panel"><p><span class="badge {"live" if is_live else ""}">{h(state_label)}</span></p><h2>{h(summary["run_id"])}</h2><dl><dt>Run status &amp; stop reason</dt><dd><b>{h(status)}</b> · {h(stop_display)}</dd><dt>Best correct candidate</dt><dd><b>{h(best_id or "none")}</b> (rule: 60/60 correctness first, then tests_passed, then lowest supervisor-measured median ms)</dd>{rev_parent_row}<dt>Started / finished (UTC)</dt><dd>{h(summary.get("started_at") or "—")} → {h(summary.get("finished_at") or ("running" if is_live else "—"))}</dd><dt>Mercury 2.5 HTTP calls</dt><dd>{h(summary.get("model_calls", "—"))}</dd><dt>Owned CreateOS microVMs</dt><dd>{h(destroyed)}/{h(len(resources))} verified destroyed</dd></dl><p class="err">{h(summary.get("error", ""))}</p><p class="err">{h(" · ".join(summary.get("warnings", [])))}</p><p class="subtitle">Timing methodology and caveats are recorded per candidate. Subtraction of IPC/data-generation overhead is noisy: <code>performance_met</code> is a finite-run threshold, not a portable speedup proof.</p></section>
