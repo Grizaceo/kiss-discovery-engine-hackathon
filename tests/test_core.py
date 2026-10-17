@@ -13,7 +13,7 @@ from kiss_engine.mercury import GenerationError, Mercury, validate_code
 from kiss_engine.report import render_report, speed_verdict
 from kiss_engine.runtime import Ledger, Sandboxes, load_secrets
 from kiss_engine.smoke import expect
-from kiss_engine.web import list_runs
+from kiss_engine.web import list_runs, platform_evidence
 
 FAKE_CODE = "def count_pairs(a,b,lower,upper):\n    return 0\n"
 
@@ -698,3 +698,76 @@ def test_render_report_static_omits_local_back_link():
     assert "← Back to local experiment ledger" not in render_report(
         summary, static=True
     )
+
+
+def test_platform_evidence_extracts_selected_fields_offline(tmp_path):
+    smoke_dir = tmp_path / "smoke-20261017T200218-804c8e"
+    smoke_dir.mkdir()
+    (smoke_dir / "summary.json").write_text(
+        json.dumps(
+            {
+                "run_id": "smoke-20261017T200218-804c8e",
+                "ok": True,
+                "inheritance_verified": True,
+                "independence_verified": True,
+                "concurrent_running_observed": 2,
+                "egress": {
+                    "https://pypi.org/simple/": {"reachable": True, "status": 200}
+                },
+                "cleanup": [{"sandbox_id": "sb-1", "status": "destroyed"}],
+                "untrusted_extra": "ignored",
+            }
+        )
+    )
+    fix_dir = tmp_path / "fixtures-20261017T195514-b9747e"
+    fix_dir.mkdir()
+    (fix_dir / "summary.json").write_text(
+        json.dumps(
+            {
+                "run_id": "fixtures-20261017T195514-b9747e",
+                "ok": True,
+                "results": [
+                    {
+                        "fixture": "timing-spoof",
+                        "expected": "protocol_error",
+                        "actual": "protocol_error",
+                        "ok": True,
+                        "feedback": {"huge": "omitted"},
+                    }
+                ],
+                "cleanup": [{"sandbox_id": "sb-2", "status": "destroyed"}],
+            }
+        )
+    )
+    audit_dir = tmp_path / "audit-20261017T215138-6151e4"
+    audit_dir.mkdir()
+    (audit_dir / "summary.json").write_text(
+        json.dumps(
+            {
+                "run_id": "audit-20261017T215138-6151e4",
+                "owned_count": 34,
+                "destroyed_count": 34,
+                "unresolved": [],
+                "usage_events": 16,
+                "provider_reported_tokens": {"total_tokens": 20350},
+                "resources": [{"id": "sb-raw"}],
+            }
+        )
+    )
+    ev = platform_evidence(tmp_path)
+    assert ev["smoke"]["inheritance_verified"] is True
+    assert ev["smoke"]["independence_verified"] is True
+    assert "untrusted_extra" not in ev["smoke"]
+    assert ev["fixtures"]["results"] == [
+        {
+            "fixture": "timing-spoof",
+            "expected": "protocol_error",
+            "actual": "protocol_error",
+            "ok": True,
+        }
+    ]
+    assert ev["audit"]["destroyed_count"] == 34
+    assert ev["audit"]["owned_count"] == 34
+    assert ev["audit"]["unresolved"] == []
+    assert ev["audit"]["provider_reported_tokens"]["total_tokens"] == 20350
+    assert "resources" not in ev["audit"]

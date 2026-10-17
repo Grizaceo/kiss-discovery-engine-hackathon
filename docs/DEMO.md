@@ -9,7 +9,32 @@ Created 2026-10-17 during the event; updated after final demo run `search-202610
 
 ---
 
-## 1. Guided demo walkthrough (2–3 minutes)
+## 1. 90-second live demo script (for Cristóbal's recording)
+
+**Exact CLI command for the single authorized demo run** (only when Cristóbal gives the explicit signal after external audit; or click **Run real experiment** in the UI with `Rounds=2, Width=2, Total candidate cap=3`):
+```sh
+uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000
+```
+
+1. **0:00–0:15 — Launch from the loopback UI (`http://127.0.0.1:8097`)**
+   - Point to **1. Problem & contract** (`count_pairs(a, b, lower, upper) -> int`, 60 hidden correctness tests before supervisor-measured timing) and **2. Launch bounded run** (`Rounds=2, Width=2, Cap=3`).
+   - Click **Run real experiment** (or show the active run banner `LIVE · IN PROGRESS`).
+2. **0:15–0:40 — Watch live states stream from `events.jsonl`**
+   - Show `g0-c0` (`sorted-bisect`) and `g0-c1` (`two-pointer`) transition from `generating` → `evaluating` inside real microVM forks of the paused base VM (`forked_from` shown live).
+   - Point out Round 0 selection (`Best correct candidate`) and how `g1-c0` (`parent-feedback-revision`) is generated from its parent's code and measured feedback and evaluated inside a physical fork of the winning parent's paused VM.
+3. **0:40–1:10 — Open the standalone report (`/report/<run-id>`)**
+   - Click **Open full standalone evidence report ↗**.
+   - Show the two lineage columns side by side: **1. Logical solution lineage (code & feedback)** vs. **2. Physical microVM lineage (CreateOS pause → fork)**.
+   - Point to the 5% noise-band verdicts (`speed_verdict`: `parity within measurement noise` vs. `slower` vs. `faster beyond the noise band`) alongside raw statuses, and end on **`4/4 verified destroyed`** in the summary panel.
+4. **1:10–1:30 — Show the Platform evidence panel (`3. Platform evidence`)**
+   - Back on the dashboard, point to **3. Platform evidence** (fed by `GET /api/evidence`):
+     - **Smoke (`smoke-20261017T200218-804c8e`):** `inheritance=true, independence=true`, egress `pypi=200 / example.com=URLError` (`3/3 VMs destroyed`).
+     - **Fixtures (`fixtures-20261017T195514-b9747e`):** `5/5 matched` (`incorrect`, `controlled-timeout`, `syntax-error`, `input-mutation`, `timing-spoof`).
+     - **Audit (`audit-20261017T215138-6151e4`):** **`34/34 VMs destroyed, unresolved=0`**, `20,350` provider-reported tokens across 16 Mercury calls.
+
+---
+
+## 1b. Detailed reference walkthrough (2–3 minutes)
 
 1. **Open the local dashboard (`http://127.0.0.1:8097`)**
    - If not running, start it on loopback only: `uv run kiss serve --port 8097`.
