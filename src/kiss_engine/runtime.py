@@ -106,11 +106,12 @@ class Ledger:
         if isinstance(data, str):
             for secret in self.secrets:
                 data = data.replace(secret, "[REDACTED]")
-            target.write_text(data)
+            content = data
         else:
-            target.write_text(
-                json.dumps(self.clean(data), indent=2, ensure_ascii=False)
-            )
+            content = json.dumps(self.clean(data), indent=2, ensure_ascii=False)
+        tmp = target.with_name(f".{target.name}.{os.urandom(4).hex()}.tmp")
+        tmp.write_text(content)
+        os.replace(tmp, target)
 
 
 def projection(box):

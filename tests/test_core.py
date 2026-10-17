@@ -771,3 +771,23 @@ def test_platform_evidence_extracts_selected_fields_offline(tmp_path):
     assert ev["audit"]["unresolved"] == []
     assert ev["audit"]["provider_reported_tokens"]["total_tokens"] == 20350
     assert "resources" not in ev["audit"]
+
+
+def test_ledger_artifact_writes_atomically_via_replace(tmp_path, monkeypatch):
+    import os
+
+    calls = []
+    real_replace = os.replace
+
+    def spy_replace(src, dst):
+        calls.append((src, dst))
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(os, "replace", spy_replace)
+    ledger = Ledger("atomic", root=tmp_path)
+    ledger.secrets = ["SECRET_TOKEN"]
+    ledger.artifact("summary.json", {"note": "has SECRET_TOKEN"})
+    assert len(calls) == 1
+    assert calls[0][1] == ledger.path / "summary.json"
+    assert not list(ledger.path.glob("*.tmp"))
+    assert "SECRET_TOKEN" not in (ledger.path / "summary.json").read_text()
