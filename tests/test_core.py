@@ -356,6 +356,7 @@ def test_invalid_structured_model_content_has_bounded_retry(tmp_path):
     ("override", "expected"),
     [
         ({"max_candidates": 1}, "max_candidates"),
+        ({"max_candidates": 2}, "max_candidates"),
         ({"max_model_calls": 1}, "max_model_calls"),
         ({"max_sandboxes": 2}, "max_sandboxes"),
     ],
@@ -385,7 +386,7 @@ def test_search_stops_at_each_configured_cap_offline(
 
         def fork(self, parent):
             self.attempts += 1
-            box = SimpleNamespace(id="FAKE_CHILD", parent=parent.id)
+            box = SimpleNamespace(id=f"FAKE_CHILD_{self.attempts}", parent=parent.id)
             self.owned.append(box)
             return box
 
@@ -437,7 +438,7 @@ def test_search_stops_at_each_configured_cap_offline(
             self.calls += 1
             return {
                 "code": FAKE_CODE,
-                "code_sha256": "FAKE_OFFLINE_HASH",
+                "code_sha256": f"FAKE_OFFLINE_HASH_{self.calls}",
                 "approach": "offline fixture",
                 "provider": "OFFLINE_TEST_FAKE",
             }
@@ -458,6 +459,10 @@ def test_search_stops_at_each_configured_cap_offline(
     } | override
     result = engine.run_search(engine.Limits(**config))
     assert result["stop_reason"] == expected
-    assert result["model_calls"] == 1
-    assert len(result["candidates"]) == 1
+    expected_count = 2 if override.get("max_candidates") == 2 else 1
+    assert result["model_calls"] == expected_count
+    assert len(result["candidates"]) == expected_count
+    assert all(c["selection_reason"] for c in result["candidates"])
+    if expected_count == 2:
+        assert "not selected" in result["candidates"][1]["selection_reason"]
     assert all(r["status"] == "destroyed" for r in result["resources"])

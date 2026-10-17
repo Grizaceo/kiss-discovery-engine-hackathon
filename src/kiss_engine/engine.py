@@ -393,6 +393,17 @@ def run_search(limits=None):
                 summary["warnings"].append(
                     "Some cleanup states unresolved; exact owned IDs and errors in cleanup.json"
                 )
+        for candidate in summary["candidates"]:
+            if not candidate.get("selection_reason"):
+                candidate["selection_reason"] = (
+                    f"not selected: status={candidate['status']}; "
+                    f"best={summary['best_candidate_id']}; correctness before measured speed"
+                )
+                ledger.event(
+                    "candidate_selection_outcome",
+                    candidate_id=candidate["candidate_id"],
+                    reason=candidate["selection_reason"],
+                )
         summary["finished_at"] = ledger.event(
             "run_finished", status=summary["status"], stop_reason=summary["stop_reason"]
         )["timestamp"]

@@ -10,7 +10,7 @@ Created 2026-10-17 during the event. Evidence below is private/local, not public
 | Own-parent feedback and physical chaining | child prompt, summary, fork events in same run | code parent g0-c0; physical origin exactly its VM |
 | Distinct initial approaches and selection | `search-20261017T195122-af1869`, `search-20261017T200300-4a7d42` | sorted-bisect/two-pointer, failures retained |
 | Incorrect/timeout/syntax/mutation/time-spoof | `fixtures-20261017T195514-b9747e` | 5/5 expected classifications |
-| Generation/API errors, retry and configured caps | `uv run pytest -q` | 72 offline tests, explicit fakes |
+| Generation/API errors, retry and configured caps | `uv run pytest -q` | 73 offline tests, explicit fakes |
 | UI renders actual results and launches | Dedicated local Chromium DOM/API | Passed; browser-created run 195854 |
 | Owned resources terminal | `audit-20261017T205226-221420` | 30/30 read back destroyed |
 
@@ -29,3 +29,5 @@ Historical reports retain their original worker-only method: do not pool their t
 Not certified against intentionally hostile arbitrary Python. AST filtering is a task-contract check, not a sandbox. Candidate shares its worker interpreter; trusted supervisor protects expected answers and baseline, but containment is not formal verification. Egress probes are empirical, not universal deny-all proof. Finite tests do not prove every input. Provider token usage was observable; currency/credit deltas were not inferred. Offline fakes never substitute for real integration evidence. No publication, push, payment, plan changes or submission performed.
 
 Independent review: `deleg_a74f905f`, read-only; PID and supervisor/baseline fixes confirmed; original four style errors subsequently fixed, current lint clean. The review explicitly preserves hostile-worker/AST-filter limitations.
+
+Final closeout also verified a clean checkout with `uv sync --locked --group dev`, offline tests, lint and CLI help. Every new candidate now receives an explicit selection/non-selection reason (including duplicates and generation failures); historical evidence is not rewritten.

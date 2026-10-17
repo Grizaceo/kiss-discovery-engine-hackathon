@@ -6,7 +6,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
 - Review fixes verified: untrusted PID ignored; authoritative supervisor timing and separate trusted baseline; finite timing checks; input mutation detection; memory cap; root-only supervisor file.
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
-- 72 offline tests passed. No generated/fixture solution run on host.
+- 73 offline tests passed. No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
 
 ## Real evidence
@@ -25,4 +25,6 @@ Final lint and build passed; source distribution and wheel checked for private s
 ## Next
 Finish verification/commit and hand off for refinement. Public delivery requires separate permission. Do not repeatedly spend credits to manufacture a better improvement story.
 
-Last verified: 2026-10-17T17:53:23.547050-03:00. Final commands: ruff check clean, 72 tests passed, sdist + wheel built; UI/report/private-route/Origin checks passed.
+Last verified: 2026-10-17T17:53:23.547050-03:00. Final commands: ruff check clean, 73 tests passed, sdist + wheel built; UI/report/private-route/Origin checks passed.
+
+Final closeout also verified a clean checkout with `uv sync --locked --group dev`, offline tests, lint and CLI help. Every new candidate now receives an explicit selection/non-selection reason (including duplicates and generation failures); historical evidence is not rewritten.
