@@ -2,6 +2,8 @@
 
 **An agent that writes code, runs every attempt in a real CreateOS microVM fork, and lets a trusted supervisor's tests decide.**
 
+**Live static evidence:** https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/
+
 ## In 30 seconds
 
 - **Problem:** Given `count_pairs(a: list[int], b: list[int], lower: int, upper: int) -> int`, count cross-list index pairs `(i, j)` with `lower <= a[i] + b[j] <= upper` (inclusive) across up to `10^6` integers in `±10^9` using only the Python 3 standard library and without mutating caller inputs.
@@ -23,6 +25,15 @@ flowchart LR
 ```
 
 **Logical vs. physical lineage:** Logical code lineage tracks which parent candidate's source code and measured feedback were sent to Mercury (`parent_candidate_id`). Physical microVM lineage tracks which paused CreateOS sandbox was cloned via `pause -> paused -> fork` (`forked_from`, verified against the server response), so Generation 1+ executes inside a physical fork of its own logical parent's paused VM rather than the base VM.
+
+## Tech stack
+
+- **Python ≥ 3.11** (`requires-python`; developed and tested locally on CPython 3.14) with **uv** for the environment and the locked dependency set (`uv.lock`).
+- **CreateOS Sandbox official Python SDK** (`createos-sandbox` 0.1.3, MIT): create, `pause -> paused -> fork`, destroy and read-back of microVMs.
+- **Stripe Projects CLI** (v0.50.0): reuses the existing provisioned CreateOS project stack (`stripe projects pull`); no new project or plan change.
+- **Mercury 2.5** via the **direct Inception API**, called with **httpx** (0.28.1).
+- **python-dotenv** (1.2.4): loads credentials into the host orchestrator process only.
+- **pytest** (offline suite with explicit fakes), **Ruff** (lint and format) and **hatchling** (build backend).
 
 ## Results
 
@@ -49,7 +60,7 @@ uv run ruff check src tests
 ```
 
 Curated static artifacts (no credentials or running server required):
-- **Static evidence index (Deployed Project URL target):** [`evidence/index.html`](evidence/index.html)
+- **Static evidence index:** [`evidence/index.html`](evidence/index.html), published at https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/
 - **Primary 2-approach + revision standalone report:** [`evidence/search-20261017T215022-01459f/report.html`](evidence/search-20261017T215022-01459f/report.html)
 - **Contrast 1-width standalone report (parent stays ahead):** [`evidence/search-20261017T200437-128ee8/report.html`](evidence/search-20261017T200437-128ee8/report.html)
 - **Platform evidence JSONs & screenshots:** [`evidence/README.md`](evidence/README.md)

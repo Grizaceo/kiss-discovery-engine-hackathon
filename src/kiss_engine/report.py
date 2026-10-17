@@ -53,13 +53,24 @@ def _fmt_ms(val):
 
 def _selection_text(c, summary):
     reason = c.get("selection_reason")
-    if reason:
-        return reason
-    if summary.get("status") == "running":
-        return "pending selection (experiment round in progress)"
     best = summary.get("best_candidate_id")
     rev_parent = summary.get("revision_parent_id")
     cid = c.get("candidate_id")
+    if reason:
+        children = [
+            k.get("candidate_id")
+            for k in summary.get("candidates", [])
+            if cid and k.get("parent_candidate_id") == cid
+        ]
+        if str(reason).startswith("not selected") and children:
+            return (
+                f"selected as revision parent of {', '.join(map(str, children))}; "
+                f"superseded by {best or rev_parent or 'later candidate'} "
+                "(historical K02 text corrected in view; raw summary.json unchanged)"
+            )
+        return reason
+    if summary.get("status") == "running":
+        return "pending selection (experiment round in progress)"
     if best and cid == best:
         return "selected as best candidate (correctness first, then fastest median)"
     if rev_parent and cid == rev_parent:

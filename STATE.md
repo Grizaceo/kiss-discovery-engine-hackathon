@@ -6,7 +6,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
 - Review fixes verified: untrusted PID ignored; authoritative supervisor timing and separate trusted baseline; finite timing checks; input mutation detection; memory cap; root-only supervisor file.
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
-- 90 offline tests passed. No generated/fixture solution run on host.
+- 91 offline tests passed (latest run: pre-publish Block A). No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
 - Added `docs/CREATEOS_REFERENCE.md`: verified CreateOS ecosystem reference (CLI, agent plugins, six SDKs, quotas, canonical links) carried over from the event preparation workspace; no code change.
 - Added `docs/CREATEOS_GUIDE.html`: full CreateOS usage guide (Spanish) built from the official documentation corpus (171 pages; live, self-contained HTML); carried over from the event preparation workspace; no code change.
@@ -34,6 +34,18 @@ Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459
   1. **Single final live demo run** (`uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000`) — wait for Cristóbal's explicit signal after external audit.
   2. **Public GitHub repo creation + `git push`**.
   3. **GitHub Pages activation** serving static `evidence/index.html` as `Deployed Project URL`.
-  4. **Submission to `https://projects.dev/leaderboard` and Discord link** (requires 6-digit email OTP at submission time, plus confirmation of 22:00 vs 23:00 Chile deadline).
+  4. **Submission to `https://projects.dev/leaderboard` and the official Google Form** (requires 6-digit email OTP at submission time; real close **Sat 2026-10-17 17:30 PT = 21:30 Chile**).
 
-Last verified: 2026-10-17T20:36:00-03:00. Block 7 / K16 & K17: `Sandboxes.cleanup()` performs a read-only inventory pass to adopt any unrecorded boxes belonging to the current run (`name == run_name` or `forked_from in owned`) and enforces a total cleanup time budget (`budget_seconds=360`), marking remaining boxes `cleanup_pending`; all Blocks 0–7 complete with 90 offline tests passed.
+Last verified: 2026-10-17T20:16-03:00 (pre-publish Block A: ruff format/check clean, 91 offline tests passed). Block 7 / K16 & K17 (commit `910d594`, 2026-10-17T19:49:53-03:00): `Sandboxes.cleanup()` performs a read-only inventory pass to adopt any unrecorded boxes belonging to the current run (`name == run_name` or `forked_from in owned`) and enforces a total cleanup time budget (`budget_seconds=360`), marking remaining boxes `cleanup_pending`; all Blocks 0–7 complete with 90 offline tests passed.
+
+## Session consolidation (2026-10-17)
+- User-requested handoff saved in `docs/SESSION_HANDOFF_2026-10-17.md` (local handoff, not published): read-only review, subsequent agent fixes, prioritized technical follow-up, submission requirements, demo ideas and form answers. No implementation edits, tests, provider calls or external actions in this consolidation.
+- Organizer announcement supplied by user supersedes earlier deadline uncertainty: **17:30 PT / 21:30 Chile** submission deadline; **18:00 PT / 22:00 Chile** demos, Oct 17. Official form: https://docs.google.com/forms/d/e/1FAIpQLSePC6jPY0H58XTw9LJQZLtGH4Ij8uFwzwkA_7oUYpZaTWkDLQ/viewform
+- Mandatory: leaderboard (`CreateOS-2026`), public repo, 2–3 minute video with a team member on camera, X/LinkedIn post, leader-submitted form. User is filling the form; completion and public URLs were not confirmed in this session.
+- 20:04 Chile: read-only audit of Devin's `f244d4c..910d594` recorded in `docs/SESSION_HANDOFF_2026-10-17.md` (local handoff, not published) (90 tests pass; no secret values in tracked files/history; `load_secrets()` preflight OK without printing; no live-run or push blocker). Should-fix: evidence report `215022` still shows parent `g0-c0` as "not selected" (historical K02 text); K13 timeouts inside HTTP reads surface as `httpx.ReadTimeout`; all-dropped benchmark samples fall back to worker self-timing. `DEMO.md` §4 deadline still stale (real close 21:30 Chile).
+
+## Pre-publish fixes (Block A, 2026-10-17 ~20:10-20:20 Chile)
+- K02 historical parent label corrected **in view only** (`report.py` `_selection_text` and dashboard `selectionNote`, same rule): a stored `selection_reason` starting with `not selected` on a candidate that has children in the same summary renders as `selected as revision parent of <children>; superseded by <best> (historical K02 text corrected in view; raw summary.json unchanged)`. Offline test added (91 total). `evidence/search-20261017T215022-01459f/report.html` regenerated (only `g0-c0`'s label changed); `evidence/search-20261017T200437-128ee8/report.html` regenerated byte-identical; `runs/` untouched. JS logic cross-checked with node against both real summaries.
+- `docs/DEMO.md`: real deadline (17:30 PT = 21:30 Chile; demos 18:00 PT = 22:00 Chile on Discord), official Google Form with the five mandatory requirements, 2–3 min on-camera video note, owner `Grizaceo` in the leaderboard table.
+- `README.md`: `## Tech stack` (from `pyproject.toml`, `uv.lock`, `docs/PROVENANCE.md`) and public evidence URL `https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/`.
+- `pyproject.toml` `Repository` URL set; empty `.nojekyll` added for GitHub Pages; internal handoff excluded via local `.git/info/exclude`.

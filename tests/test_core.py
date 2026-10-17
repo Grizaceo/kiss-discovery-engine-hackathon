@@ -13,7 +13,7 @@ from kiss_engine.mercury import GenerationError, Mercury, validate_code
 from kiss_engine.report import render_report, speed_verdict
 from kiss_engine.runtime import Ledger, Sandboxes, checked, deadline, load_secrets
 from kiss_engine.smoke import expect
-from kiss_engine.web import list_runs, make_handler, platform_evidence
+from kiss_engine.web import PAGE, list_runs, make_handler, platform_evidence
 
 FAKE_CODE = "def count_pairs(a,b,lower,upper):\n    return 0\n"
 
@@ -690,6 +690,50 @@ def test_smoke_expect_raises_runtime_error():
     expect("base-marker", "base-marker", "marker check")
     with pytest.raises(RuntimeError, match="Smoke check failed"):
         expect("wrong", "base-marker", "marker check")
+
+
+def test_render_report_corrects_historical_k02_parent_label_in_view_only():
+    # Shape of runs/search-20261017T215022-01459f/summary.json (pre-K02-fix text).
+    summary = {
+        "run_id": "search-20261017T215022-01459f",
+        "status": "completed",
+        "best_candidate_id": "g1-c0",
+        "revision_parent_id": None,
+        "candidates": [
+            {
+                "candidate_id": "g0-c0",
+                "parent_candidate_id": None,
+                "status": "performance_met",
+                "selection_reason": "not selected: status=performance_met (60/60 tests, median=6.942ms); best=g1-c0; correctness before measured speed",
+            },
+            {
+                "candidate_id": "g0-c1",
+                "parent_candidate_id": None,
+                "status": "correct",
+                "selection_reason": "not selected: status=correct (60/60 tests, median=9.667ms); best=g1-c0; correctness before measured speed",
+            },
+            {
+                "candidate_id": "g1-c0",
+                "parent_candidate_id": "g0-c0",
+                "status": "performance_met",
+                "selection_reason": "correctness/test count first; fastest supervisor-measured median among tied passing candidates; noisy finite-run estimate",
+            },
+        ],
+    }
+    raw = json.dumps(summary, sort_keys=True)
+    html = render_report(summary, static=True)
+    cards = {
+        cid: html.split(f"<h2>{cid} ", 1)[1].split("</article>", 1)[0]
+        for cid in ("g0-c0", "g0-c1", "g1-c0")
+    }
+    assert "selected as revision parent of g1-c0; superseded by g1-c0" in cards["g0-c0"]
+    assert "historical K02 text corrected in view" in cards["g0-c0"]
+    assert "not selected" not in cards["g0-c0"]
+    assert "not selected" in cards["g0-c1"]
+    assert "selected as revision parent" not in cards["g0-c1"]
+    assert "not selected" not in cards["g1-c0"]
+    assert json.dumps(summary, sort_keys=True) == raw
+    assert "historical K02 text corrected in view" in PAGE
 
 
 def test_render_report_static_omits_local_back_link():

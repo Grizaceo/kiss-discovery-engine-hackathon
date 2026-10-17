@@ -11,6 +11,8 @@ Created 2026-10-17 during the event; updated after final demo run `search-202610
 
 ## 1. 90-second live demo script (for Cristóbal's recording)
 
+> **Final video:** must last 2–3 minutes with at least one team member on camera; this 90-second script covers only the screen-recording segment.
+
 **Exact CLI command for the single authorized demo run** (only when Cristóbal gives the explicit signal after external audit; or click **Run real experiment** in the UI with `Rounds=2, Width=2, Total candidate cap=3`):
 ```sh
 uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000
@@ -113,11 +115,7 @@ uv run kiss audit
 
 ## 4. Two submission channels & permission gates
 
-**Deadline (confirm with Cristóbal — discrepancy noted):**
-- Previous note in this document: **22:00 Chile** (`America/Santiago`, UTC-3; 18:00 PT).
-- Team hackathon calendar (`hackathon_calendar` / `data/hackathons.json`): **23:00 Chile** (`2026-10-17T23:00:00-03:00`; 19:00 PT).
-- *Action required:* Cristóbal, please confirm whether the official submission close is **22:00** or **23:00** Chile time.
-**Internal target:** 21:45 Chile.
+**Deadline:** Sat 2026-10-17 17:30 PT = 21:30 Chile (organizer announcement). **Demos:** 18:00 PT = 22:00 Chile on Discord.
 **Hackathon code:** `CreateOS-2026` (internal slug on leaderboard filter: `createos-2026`).
 
 ### Channel A: Stripe Projects Leaderboard (`https://projects.dev/leaderboard`)
@@ -130,13 +128,19 @@ Verified by inspecting the live page and client bundle (`SubmitProjectModal`):
 |---|---|---|
 | `Name / Username` | `Cristóbal Muñoz` (or GitHub handle `Grizaceo`) | Ready |
 | `Stripe Account ID` | Retrieved in-memory at submission time via `stripe whoami --format json` (`^acct_[a-zA-Z0-9]{16}$`; **never printed or committed to tracked files**) | Ready (local CLI) |
-| `Public Repo URL` | `https://github.com/<owner>/kiss-discovery-engine-hackathon` (validated by `POST /api/validate-repo`, which pulls name + description from GitHub) | Pending push authorization |
-| `Deployed Project URL` | `https://<owner>.github.io/kiss-discovery-engine-hackathon/evidence/` (serves static, zero-JS `evidence/index.html`; **never** expose `kiss serve` or any execution endpoint) | Pending push + Pages authorization |
+| `Public Repo URL` | `https://github.com/Grizaceo/kiss-discovery-engine-hackathon` (validated by `POST /api/validate-repo`, which pulls name + description from GitHub) | Pending push authorization |
+| `Deployed Project URL` | `https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/` (serves static, zero-JS `evidence/index.html`; **never** expose `kiss serve` or any execution endpoint) | Pending push + Pages authorization |
 | `Stack URL` | `https://projects.dev/s#v1:createos~project` | Ready |
 | `Hackathon code` | `CreateOS-2026` (filter slug: `createos-2026`) | Ready |
 
-### Channel B: Additional Discord deadline link
-- Shared by organizers in Discord near the closing deadline.
+### Channel B: official Google Form (one submission per team, sent by the team leader)
+- URL: https://docs.google.com/forms/d/e/1FAIpQLSePC6jPY0H58XTw9LJQZLtGH4Ij8uFwzwkA_7oUYpZaTWkDLQ/viewform
+- Mandatory requirements (all five):
+  1. Leaderboard entry on `https://projects.dev/leaderboard` with hackathon code `CreateOS-2026` (Channel A).
+  2. A 2–3 minute video with at least one team member on camera (screen-only does not count), hosted as unlisted YouTube, Loom or Google Drive.
+  3. A public repo whose README covers what it does, how to run it and the tech used, with no `.env` or keys.
+  4. A post on X or LinkedIn tagging @createosai / CreateOS and @stripe.
+  5. This form.
 - Uses the copy-ready pitch (§3), `Public Repo URL`, `Deployed Project URL`, and evidence summary above.
 
 ### Pre-publish repository hygiene checklist (verified read-only)
@@ -174,5 +178,5 @@ Verified by inspecting the live page and client bundle (`SubmitProjectModal`):
    uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000
    uv run kiss audit
    ```
-4. **Form submission (`https://projects.dev/leaderboard` + Discord link):**
+4. **Form submission (`https://projects.dev/leaderboard` + official Google Form):**
    - Only after steps 1–2 are authorized and live, request the 6-digit email OTP from Cristóbal and submit with the table values above.
