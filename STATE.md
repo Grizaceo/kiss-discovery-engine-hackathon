@@ -8,6 +8,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
 - 73 offline tests passed. No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
+- Added `docs/CREATEOS_REFERENCE.md`: verified CreateOS ecosystem reference (CLI, agent plugins, six SDKs, quotas, canonical links) carried over from the event preparation workspace; no code change.
 
 ## Real evidence
 - `runs/smoke-20261017T200218-804c8e/summary.json`: inheritance, independence, two running children, pypi.org positive/example.com negative probes; three resources destroyed.
