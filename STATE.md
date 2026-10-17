@@ -6,7 +6,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
 - Review fixes verified: untrusted PID ignored; authoritative supervisor timing and separate trusted baseline; finite timing checks; input mutation detection; memory cap; root-only supervisor file.
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
-- 89 offline tests passed. No generated/fixture solution run on host.
+- 90 offline tests passed. No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
 - Added `docs/CREATEOS_REFERENCE.md`: verified CreateOS ecosystem reference (CLI, agent plugins, six SDKs, quotas, canonical links) carried over from the event preparation workspace; no code change.
 - Added `docs/CREATEOS_GUIDE.html`: full CreateOS usage guide (Spanish) built from the official documentation corpus (171 pages; live, self-contained HTML); carried over from the event preparation workspace; no code change.
@@ -36,4 +36,4 @@ Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459
   3. **GitHub Pages activation** serving static `evidence/index.html` as `Deployed Project URL`.
   4. **Submission to `https://projects.dev/leaderboard` and Discord link** (requires 6-digit email OTP at submission time, plus confirmation of 22:00 vs 23:00 Chile deadline).
 
-Last verified: 2026-10-17T20:32:00-03:00. Block 7 / K20 (web): extracted `make_handler(root, port)` in `src/kiss_engine/web.py` and added offline `ThreadingHTTPServer` tests for Host/Origin/Content-Type/body-size/run-ID validation with monkeypatched `subprocess.Popen`; 89 offline tests passed.
+Last verified: 2026-10-17T20:36:00-03:00. Block 7 / K16 & K17: `Sandboxes.cleanup()` performs a read-only inventory pass to adopt any unrecorded boxes belonging to the current run (`name == run_name` or `forked_from in owned`) and enforces a total cleanup time budget (`budget_seconds=360`), marking remaining boxes `cleanup_pending`; all Blocks 0–7 complete with 90 offline tests passed.

@@ -968,3 +968,57 @@ def test_web_handler_http_security_and_validation(tmp_path, monkeypatch):
         server.server_close()
         if job["log"]:
             job["log"].close()
+
+
+def test_cleanup_adopts_missing_run_boxes_and_bounds_budget(tmp_path):
+    from dataclasses import dataclass
+    from types import SimpleNamespace
+
+    @dataclass
+    class BoxData:
+        id: str
+        name: str
+        status: str = "destroyed"
+        forked_from: str = ""
+
+    def make_box(id, name, forked_from=""):
+        b = SimpleNamespace(
+            id=id,
+            status="destroyed",
+            data=BoxData(id=id, name=name, forked_from=forked_from),
+            refresh=lambda: None,
+            destroy=lambda: None,
+        )
+        return b
+
+    ledger = Ledger("search", root=tmp_path)
+    run_name = ("kiss-" + ledger.run_id[-17:]).lower()
+    base = make_box("sb-base", run_name)
+    orphan_child = make_box("sb-orphan-child", "forked-box", forked_from="sb-base")
+    unrelated = make_box("sb-other-run", "kiss-unrelated")
+
+    adapter = Sandboxes.__new__(Sandboxes)
+    adapter.ledger = ledger
+    adapter.initial_ids = set()
+    adapter.owned = {"sb-base": base}
+    adapter.op = lambda name, fn, **kw: fn()
+    adapter.client = SimpleNamespace(
+        list_sandboxes=lambda opts: [base, orphan_child, unrelated],
+        close=lambda: None,
+    )
+    results = adapter.cleanup(budget_seconds=60)
+    assert {r["sandbox_id"] for r in results} == {"sb-base", "sb-orphan-child"}
+    assert "sb-other-run" not in adapter.owned
+    assert all(r["status"] == "destroyed" for r in results)
+
+    # Budget exhausted -> remaining boxes recorded as cleanup_pending
+    adapter2 = Sandboxes.__new__(Sandboxes)
+    adapter2.ledger = Ledger("search", root=tmp_path)
+    adapter2.initial_ids = set()
+    adapter2.owned = {"sb-1": make_box("sb-1", "a"), "sb-2": make_box("sb-2", "b")}
+    adapter2.op = lambda name, fn, **kw: fn()
+    adapter2.client = SimpleNamespace(
+        list_sandboxes=lambda opts: [], close=lambda: None
+    )
+    pending = adapter2.cleanup(budget_seconds=0)
+    assert [r["status"] for r in pending] == ["cleanup_pending", "cleanup_pending"]

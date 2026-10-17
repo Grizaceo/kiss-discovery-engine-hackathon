@@ -327,17 +327,65 @@ class Sandboxes:
         self.wait(box, "destroyed", seconds=45)
         self.ledger.event("cleanup_verified", **projection(box))
 
-    def cleanup(self):
+    def cleanup(self, budget_seconds=360):
+        cleanup_end = time.monotonic() + budget_seconds
+        run_name = ("kiss-" + self.ledger.run_id[-17:]).lower()
+        try:
+            rem = cleanup_end - time.monotonic()
+            if rem > 0:
+                inventory = self.op(
+                    "cleanup_reconcile",
+                    lambda: self.client.list_sandboxes(ListSandboxesOptions(limit=500)),
+                    timeout=min(25, rem),
+                )
+                progressed = True
+                while progressed:
+                    progressed = False
+                    for box in inventory:
+                        if box.id in self.initial_ids or box.id in self.owned:
+                            continue
+                        d = projection(box)
+                        if (
+                            d.get("name") == run_name
+                            or d.get("forked_from") in self.owned
+                        ):
+                            self.owned[box.id] = box
+                            self.ledger.event("resource_reconciled", **d)
+                            progressed = True
+        except Exception as exc:  # noqa: BLE001 - continue cleaning known owned resources
+            self.ledger.event(
+                "cleanup_reconcile_warning",
+                error_type=type(exc).__name__,
+                error=str(exc),
+            )
         results = []
         for box in reversed(list(self.owned.values())):
+            rem = cleanup_end - time.monotonic()
+            if rem <= 0:
+                results.append(
+                    {
+                        "sandbox_id": box.id,
+                        "status": "cleanup_pending",
+                        "error": "Cleanup time budget exhausted",
+                    }
+                )
+                continue
             try:
-                self.destroy(box)
+                with deadline(rem):
+                    self.destroy(box)
                 results.append(
                     {"sandbox_id": box.id, "status": "destroyed", "verified": True}
                 )
             except Exception as exc:  # noqa: BLE001 - record failure and always clean owned resources
+                timed_out = (
+                    isinstance(exc, TimeoutError) and time.monotonic() >= cleanup_end
+                )
                 results.append(
-                    {"sandbox_id": box.id, "status": "cleanup_error", "error": str(exc)}
+                    {
+                        "sandbox_id": box.id,
+                        "status": "cleanup_pending" if timed_out else "cleanup_error",
+                        "error": str(exc),
+                    }
                 )
         self.ledger.artifact("cleanup.json", results)
         self.client.close()
