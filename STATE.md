@@ -23,9 +23,9 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Chromium DOM and visual screenshots (`runs/captures-20261017/`) verified rendering, live vs historical run state, task contract, dual lineage, timings, errors and selection reasons. Dashboard http://127.0.0.1:8097.
 
 ## Closing
-Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459f`), read-only resource reconciliation (`34/34 destroyed`), presentation/submission materials (`docs/DEMO.md`), offline tests and lint completed. No public exposure, push, submission, plan change or payment. No sandbox active.
+Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459f`), read-only resource reconciliation (`34/34 destroyed`), presentation/submission materials (`docs/DEMO.md`), offline tests and lint completed. Repository and static evidence published with explicit authorization (see "Publication" below); no execution endpoint exposed, no plan change or payment. No sandbox active.
 
-## Next (prepared locally; awaiting explicit authorization)
+## Next (prepared locally; items 2-3 done under explicit authorization, see "Publication")
 - **Prepared & verified locally (no external side effects performed):**
   - Read-only repo hygiene verified (`.env`, `.projects/`, `runs/` ignored; `git log --all --name-only` clean; `evidence/` scanned against all local secrets and key/path patterns).
   - Exact `gh repo create ... --public --push` and GitHub Pages (`evidence/index.html`) commands documented in `docs/DEMO.md` §4.
@@ -54,3 +54,8 @@ Last verified: 2026-10-17T20:14-03:00 (pre-publish Block A: ruff format/check cl
 - Figures re-derived read-only from `runs/` and `evidence/` summaries and matched across README, `docs/VERIFICATION.md`, `docs/DEMO.md`, `STATE.md`, `evidence/index.html`: 34/34 destroyed, 20,350 tokens (11,271 + 9,079, 16 usage events), ratios 0.973×/1.349×/0.892× (`215022`) and 0.832× (`200300`). Fixed: test count 90 → 91 in `docs/VERIFICATION.md`; README "7 real runs" → the 11 runs listed in the audit's `owner_runs`; DEMO screenshot location.
 - Hygiene scan (counts only): 5 secret values loaded in-process from `.env` + `MERCURY_ENV_FILE`; 0 occurrences in tracked files, 0 in `git log --all -p`, 0 in commit messages. Patterns: `sk-` 1 tracked (false positive `task-contract`), `Bearer`/`acct_…16`/`PRIVATE KEY` 0, emails only `example.com` placeholders and binary/`@pytest` false positives, home-directory path pattern 0 tracked but 4 in history (local path in `8901471`, removed by `44e8322`; no key values; history not rewritten, as instructed).
 - `.env`, `.projects/`, `runs/`, `dist/`, `.venv/`, caches ignored (`git check-ignore -v`); handoff excluded via `.git/info/exclude`.
+
+## Publication (Block C, explicit authorization from Cristóbal)
+- Public repo: https://github.com/Grizaceo/kiss-discovery-engine-hackathon (created 2026-10-17 ~20:17 Chile with `gh repo create --public --source=. --remote=origin --push`). Read-back: `visibility: PUBLIC`, description set, `git ls-remote origin main` = local HEAD `baa8d75ce38c1033e7868460b35b1698256772fa`, anonymous `curl` HTTP 200.
+- GitHub Pages (legacy, `main` `/`, `.nojekyll`): https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/ HTTP 200 at 20:18:17 Chile (third 15 s poll); build `status: built` for commit `baa8d75`. Read-back: `evidence/search-20261017T215022-01459f/report.html` 200 (shows the K02 view correction), `evidence/captures-20261017/report-search-20261017T215022-01459f.png` 200 `image/png`.
+- Only static files are published; `kiss serve` stays loopback-only. No force push, history rewrite, tunnel, plan change or payment.

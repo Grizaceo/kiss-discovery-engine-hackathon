@@ -1,5 +1,5 @@
 # Verification evidence
-Created 2026-10-17 during the event. Evidence below is private/local, not public URLs.
+Created 2026-10-17 during the event. Paths under `runs/` are local and gitignored; curated, secret-scanned copies are public under `evidence/` (https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/).
 
 | Requirement | Evidence | Result |
 |---|---|---|
@@ -36,7 +36,7 @@ Historical reports retain their original worker-only method: do not pool their t
 
 ## Limits
 
-Not certified against intentionally hostile arbitrary Python. AST filtering is a task-contract check, not a sandbox. Candidate shares its worker interpreter; trusted supervisor protects expected answers and baseline, but containment is not formal verification. Egress probes are empirical, not universal deny-all proof. Finite tests do not prove every input. Provider token usage was observable; currency/credit deltas were not inferred. Offline fakes never substitute for real integration evidence. No publication, push, payment, plan changes or submission performed.
+Not certified against intentionally hostile arbitrary Python. AST filtering is a task-contract check, not a sandbox. Candidate shares its worker interpreter; trusted supervisor protects expected answers and baseline, but containment is not formal verification. Egress probes are empirical, not universal deny-all proof. Finite tests do not prove every input. Provider token usage was observable; currency/credit deltas were not inferred. Offline fakes never substitute for real integration evidence. No payment or plan change performed; the repository and the static `evidence/` bundle were published on GitHub / GitHub Pages with explicit authorization, and no execution endpoint is exposed.
 
 Independent review: `deleg_a74f905f`, read-only; PID and supervisor/baseline fixes confirmed; original four style errors subsequently fixed, current lint clean. The review explicitly preserves hostile-worker/AST-filter limitations.
 

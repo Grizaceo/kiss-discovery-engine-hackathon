@@ -1,5 +1,5 @@
 # Local demonstration and submission package
-Created 2026-10-17 during the event; updated after final demo run `search-20261017T215022-01459f`. Local-only: no public exposure, push or form submission performed.
+Created 2026-10-17 during the event; updated after final demo run `search-20261017T215022-01459f`. Public repo https://github.com/Grizaceo/kiss-discovery-engine-hackathon and static evidence https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/ published 2026-10-17 ~20:18 Chile; `kiss serve` stays loopback-only.
 
 ## Central message
 
@@ -128,8 +128,8 @@ Verified by inspecting the live page and client bundle (`SubmitProjectModal`):
 |---|---|---|
 | `Name / Username` | `Cristóbal Muñoz` (or GitHub handle `Grizaceo`) | Ready |
 | `Stripe Account ID` | Retrieved in-memory at submission time via `stripe whoami --format json` (`^acct_[a-zA-Z0-9]{16}$`; **never printed or committed to tracked files**) | Ready (local CLI) |
-| `Public Repo URL` | `https://github.com/Grizaceo/kiss-discovery-engine-hackathon` (validated by `POST /api/validate-repo`, which pulls name + description from GitHub) | Pending push authorization |
-| `Deployed Project URL` | `https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/` (serves static, zero-JS `evidence/index.html`; **never** expose `kiss serve` or any execution endpoint) | Pending push + Pages authorization |
+| `Public Repo URL` | `https://github.com/Grizaceo/kiss-discovery-engine-hackathon` (validated by `POST /api/validate-repo`, which pulls name + description from GitHub) | Live (`PUBLIC`, anonymous HTTP 200) |
+| `Deployed Project URL` | `https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/` (serves static, zero-JS `evidence/index.html`; **never** expose `kiss serve` or any execution endpoint) | Live (HTTP 200) |
 | `Stack URL` | `https://projects.dev/s#v1:createos~project` | Ready |
 | `Hackathon code` | `CreateOS-2026` (filter slug: `createos-2026`) | Ready |
 
