@@ -4,12 +4,16 @@ import json
 import subprocess
 import sys
 import threading
+import time
+from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from .engine import Limits
 from .report import render_report
+
+STALE_SECONDS = 900
 
 PAGE = """<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KISS Discovery Engine</title><style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{background:#0a1019;color:#e6edf3;font:15px/1.55 system-ui;max-width:1220px;margin:32px auto;padding:0 24px}h1{font-size:40px;letter-spacing:-1.2px;margin:4px 0 8px}h2{margin:0 0 10px;font-size:20px}.overline{color:#50deb3;text-transform:uppercase;letter-spacing:3px;font-size:12px;margin:0}p,small{color:#9eadbd;margin:6px 0}.layout{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start}section,.run{border:1px solid #273646;border-radius:16px;padding:20px;background:#101925;margin:14px 0}.run.live-run{border-color:#d29922;background:#171f2c}button,a.button{background:#69e8ba;color:#082217;border:0;border-radius:9px;padding:11px 18px;font-weight:750;cursor:pointer;width:100%;margin-top:8px}button:disabled{opacity:.4;cursor:wait}label{display:block;margin:12px 0;color:#b9c8d5;font-size:14px}input,select{width:100%;padding:8px;margin-top:4px;background:#0a111c;color:#e8f1f7;border:1px solid #3b4a5e;border-radius:7px}a{color:#7dc9ff}.report-link{display:inline-block;margin:8px 0;font-weight:650}pre{font:12px/1.5 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;background:#090f17;padding:12px;border-radius:8px;border:1px solid #223041}.run h3{margin:6px 0;word-break:break-word;font-size:19px}.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.badge{padding:3px 9px;border:1px solid #405066;border-radius:20px;font-size:12px;color:#a8edd1;background:#132530}.badge.hist{color:#b8c7d9;background:#182230;border-color:#344558}.badge.live{color:#ffd885;background:#4b3409;border-color:#9e6a03}.badge.warn{color:#ffac9c;background:#3b1d22;border-color:#7d333d}.badge.win{color:#a0f0be;background:#114932;border-color:#2ea043}.candidate{border-left:3px solid #3a5d62;padding:8px 0 8px 14px;margin:14px 0;background:#0c141f;border-radius:0 10px 10px 0}.candidate.winner{border-left-color:#50deb3;background:#0d1a22}.candidate p,.candidate small{margin:4px 0;display:block}.error{color:#ffac9c}#job{min-height:26px;font-weight:600;color:#ffd885}summary{cursor:pointer;color:#9ecbff;font-size:13px;margin-top:4px}.contract{font-size:13px;background:#0b121c;border:1px solid #223244;border-radius:10px;padding:10px 12px;margin:10px 0}code{font-family:monospace;color:#c9e1ff}@media(max-width:820px){.layout{grid-template-columns:1fr}h1{font-size:32px}}
@@ -114,6 +118,25 @@ def list_runs(root):
                 {k: v for k, v in c.items() if k != "execution"}
                 for c in candidates.values()
             ]
+            if summary.get("status") == "running":
+                last_ts = (
+                    events[-1].get("timestamp")
+                    if events and events[-1].get("timestamp")
+                    else summary.get("started_at")
+                )
+                age = None
+                if isinstance(last_ts, str):
+                    try:
+                        age = (
+                            datetime.now(UTC) - datetime.fromisoformat(last_ts)
+                        ).total_seconds()
+                    except ValueError:
+                        age = None
+                if age is None:
+                    ref = event_file if event_file.exists() else (path / "summary.json")
+                    age = time.time() - ref.stat().st_mtime
+                if age > STALE_SECONDS:
+                    summary["status"] = "stale"
             summary["latest_events"] = [
                 {k: v for k, v in e.items() if k not in {"task", "feedback"}}
                 for e in events[-5:]

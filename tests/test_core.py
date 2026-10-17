@@ -861,3 +861,24 @@ def test_nested_deadline_respects_outer_remaining_time():
         time.sleep(2)
     elapsed = time.monotonic() - started
     assert elapsed < 1.3
+
+
+def test_stale_running_run_shown_as_stale_without_rewriting_summary(tmp_path):
+    from datetime import UTC, datetime, timedelta
+
+    path = tmp_path / "search-stale"
+    path.mkdir()
+    old_ts = (datetime.now(UTC) - timedelta(seconds=950)).isoformat()
+    raw_summary = {
+        "run_id": "search-stale",
+        "status": "running",
+        "started_at": old_ts,
+        "candidates": [],
+    }
+    (path / "summary.json").write_text(json.dumps(raw_summary))
+    (path / "events.jsonl").write_text(
+        json.dumps({"event": "search_preparing", "timestamp": old_ts}) + "\n"
+    )
+    rows = list_runs(tmp_path)
+    assert rows[0]["status"] == "stale"
+    assert json.loads((path / "summary.json").read_text())["status"] == "running"
