@@ -25,7 +25,15 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 ## Closing
 Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459f`), read-only resource reconciliation (`34/34 destroyed`), presentation/submission materials (`docs/DEMO.md`), offline tests and lint completed. No public exposure, push, submission, plan change or payment. No sandbox active.
 
-## Next
-Ready for demo and external submission gates. Public GitHub push, public static report/demo URL, and submission to `https://projects.dev/leaderboard` (code `CreateOS-2026`, stack URL `https://projects.dev/s#v1:createos~project`) + the Discord deadline link require explicit user authorization.
+## Next (prepared locally; awaiting explicit authorization)
+- **Prepared & verified locally (no external side effects performed):**
+  - Read-only repo hygiene verified (`.env`, `.projects/`, `runs/` ignored; `git log --all --name-only` clean; `evidence/` scanned against all local secrets and key/path patterns).
+  - Exact `gh repo create ... --public --push` and GitHub Pages (`evidence/index.html`) commands documented in `docs/DEMO.md` §4.
+  - All `https://projects.dev/leaderboard` form values prepared (`Name`, in-memory `stripe whoami --format json`, `Stack URL` `https://projects.dev/s#v1:createos~project`, code `CreateOS-2026`).
+- **Gated on explicit authorization from Cristóbal:**
+  1. **Single final live demo run** (`uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000`) — wait for Cristóbal's explicit signal after external audit.
+  2. **Public GitHub repo creation + `git push`**.
+  3. **GitHub Pages activation** serving static `evidence/index.html` as `Deployed Project URL`.
+  4. **Submission to `https://projects.dev/leaderboard` and Discord link** (requires 6-digit email OTP at submission time, plus confirmation of 22:00 vs 23:00 Chile deadline).
 
-Last verified: 2026-10-17T20:10:00-03:00. Block 5 (K04): synchronized `README.md`, `docs/VERIFICATION.md`, `docs/DEMO.md`, and `STATE.md` with 84 offline tests, K03 noise-band labels (`selected by rule; difference within measurement noise`), K02 historical note on `215022`, `time.perf_counter` fixture description, and closing-time discrepancy (22:00 vs 23:00 Chile); Blocks 6–7 pending.
+Last verified: 2026-10-17T20:15:00-03:00. Block 6 (K11): verified pre-publish repo hygiene in read-only mode, documented exact GitHub repo/push/Pages commands and prepared submission fields in `docs/DEMO.md` §4, and recorded authorization gates in `STATE.md`; 84 offline tests passed; Block 7 (optional P2 fixes) next.

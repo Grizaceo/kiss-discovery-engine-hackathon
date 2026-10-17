@@ -123,22 +123,56 @@ uv run kiss audit
 ### Channel A: Stripe Projects Leaderboard (`https://projects.dev/leaderboard`)
 Verified by inspecting the live page and client bundle (`SubmitProjectModal`):
 - **How submission works:** Web modal opened via **"Submit Your Project"** on `https://projects.dev/leaderboard` (not a CLI command; `stripe projects` v0.50.0 has no `share` or `submit` subcommand).
-- **Step 1 — Identity verification:** Email OTP (`POST /api/auth/otp`) sent to the email address associated with the Stripe Projects account (6-digit Clerk verification code).
-- **Step 2 — Required fields (`POST /api/projects`):**
-  1. `Name / Username` (`required`): e.g. Cristóbal's handle/name.
-  2. `Stripe Account ID` (`required`, regex `^acct_[a-zA-Z0-9]{16}$`, 21 chars): local account ID from `stripe whoami --format json`.
-  3. `Deployed Project URL` (`required`, `type="url"`): public URL for the project/demo report.
-  4. `Public Repo URL` (`required`, `type="url"`): validated by `POST /api/validate-repo` (must be a public GitHub repository; pulls repository name and description from GitHub).
-  5. `Stack URL` (`required`, `type="url"`): although the modal hint text says `Get this by running stripe projects share`, `stripe projects` v0.50.0 has no `share` subcommand. Existing `CreateOS 2026` entries on `https://projects.dev/leaderboard` and `https://projects.dev/s` use:
-     `https://projects.dev/s#v1:createos~project`
-  6. `Hackathon code`: `CreateOS-2026`
+- **Step 1 — Identity verification:** Email OTP (`POST /api/auth/otp`) sent to the email address associated with the Stripe Projects account (6-digit Clerk verification code — requested from Cristóbal **only** at the moment of live submission after push and GitHub Pages are authorized and live).
+- **Step 2 — Prepared submission field values (`POST /api/projects`):**
+
+| Field | Prepared value / source | Status |
+|---|---|---|
+| `Name / Username` | `Cristóbal Muñoz` (or GitHub handle `Grizaceo`) | Ready |
+| `Stripe Account ID` | Retrieved in-memory at submission time via `stripe whoami --format json` (`^acct_[a-zA-Z0-9]{16}$`; **never printed or committed to tracked files**) | Ready (local CLI) |
+| `Public Repo URL` | `https://github.com/<owner>/kiss-discovery-engine-hackathon` (validated by `POST /api/validate-repo`, which pulls name + description from GitHub) | Pending push authorization |
+| `Deployed Project URL` | `https://<owner>.github.io/kiss-discovery-engine-hackathon/evidence/` (serves static, zero-JS `evidence/index.html`; **never** expose `kiss serve` or any execution endpoint) | Pending push + Pages authorization |
+| `Stack URL` | `https://projects.dev/s#v1:createos~project` | Ready |
+| `Hackathon code` | `CreateOS-2026` (filter slug: `createos-2026`) | Ready |
 
 ### Channel B: Additional Discord deadline link
-- Shared by organizers in Discord near the 22:00 Chile deadline.
-- Uses the copy-ready pitch, repo URL, deployed report/demo URL, and evidence summary above.
+- Shared by organizers in Discord near the closing deadline.
+- Uses the copy-ready pitch (§3), `Public Repo URL`, `Deployed Project URL`, and evidence summary above.
 
-### Explicit permissions needed from Cristóbal before publishing/submitting
-Nothing has been pushed, published, exposed, or submitted. To complete external delivery, authorize explicitly:
-1. **Public GitHub repository + `git push`:** Permission to create/push this clean repository (with `.env`, `.projects/`, and raw `runs/` excluded by `.gitignore`) to a public GitHub URL required by `/api/validate-repo`.
-2. **Public `Deployed Project URL`:** Permission to publish a static, secret-free evidence page (recommended: GitHub Pages serving a sanitized static report of `search-20261017T215022-01459f`, as other `CreateOS 2026` leaderboard entries have done, avoiding any public execution endpoint or credential exposure).
-3. **Form submission:** Permission (and the 6-digit email OTP on `projects.dev/leaderboard`, plus the Discord link once posted) to submit to both channels.
+### Pre-publish repository hygiene checklist (verified read-only)
+- `git status`: clean working tree.
+- `.gitignore`: `.env`, `.env.*` (except `.env.example`), `.projects/`, `runs/`, and `credentials*` are gitignored (`git check-ignore -v .env .projects/ runs/`). Curated, secret-scanned `evidence/` is tracked.
+- `git log --all --name-only`: zero `.env`, `.projects/`, `runs/`, or credential files in any historical commit.
+- Secret & path scan across tracked files: zero secret values from `.env` / `MERCURY_ENV_FILE`, zero API key tokens, and zero personal home-directory paths. Author email in git log is accepted as-is without history rewrite.
+
+### Exact commands to execute ONLY after Cristóbal's explicit authorization
+
+1. **Create the public GitHub repository, set the `/api/validate-repo` description from §3, update `pyproject.toml`, and push `main`:**
+   ```sh
+   # DO NOT RUN until Cristóbal explicitly authorizes public repo creation + push:
+   gh repo create kiss-discovery-engine-hackathon \
+     --public \
+     --source=. \
+     --remote=origin \
+     --description "KISS explores code solutions in real CreateOS microVM forks with Mercury 2.5 and preserves verifiable evidence of what worked, what failed, and where each attempt came from." \
+     --push
+   ```
+2. **Enable GitHub Pages (serving static `evidence/index.html` from `main` `/` root — never `kiss serve`):**
+   ```sh
+   # DO NOT RUN until after the public push above is authorized and completed:
+   OWNER="$(gh api user -q .login)"
+   gh api -X POST "repos/${OWNER}/kiss-discovery-engine-hackathon/pages" \
+     -f "build_type=legacy" \
+     -f "source[branch]=main" \
+     -f "source[path]=/"
+   # Resulting Deployed Project URL once live:
+   # https://${OWNER}.github.io/kiss-discovery-engine-hackathon/evidence/
+   ```
+3. **Single final demo run (ONLY when Cristóbal gives the explicit post-audit signal):**
+   ```sh
+   # DO NOT RUN until Cristóbal explicitly authorizes the single final demo run:
+   uv run kiss run --rounds 2 --width 2 --max-candidates 3 --max-sandboxes 4 --max-model-calls 5 --search-seconds 300 --benchmark-n 20000
+   uv run kiss audit
+   ```
+4. **Form submission (`https://projects.dev/leaderboard` + Discord link):**
+   - Only after steps 1–2 are authorized and live, request the 6-digit email OTP from Cristóbal and submit with the table values above.
