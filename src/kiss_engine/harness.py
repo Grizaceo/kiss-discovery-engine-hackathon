@@ -999,7 +999,8 @@ def run_benchmark(channel, clock, result):
         net = wall-null_wall
         if net <= 0:
             reliable = False
-        authoritative_candidate.append(net if net > 0 else wall)
+        else:
+            authoritative_candidate.append(net)
         authoritative_baseline.append(trusted_ms)
         outside_samples.append({"seed":rep_seed,"candidate_roundtrip_ms":wall,"overhead_roundtrip_ms":null_wall,"candidate_adjusted_ms":net,"trusted_baseline_ms":trusted_ms})
 
@@ -1016,7 +1017,7 @@ def run_benchmark(channel, clock, result):
     overhead = root_walls["none"]
     worker_candidate_ms = statistics.median(candidate_reps)
     worker_baseline_ms = statistics.median(baseline_reps)
-    candidate_ms = statistics.median(authoritative_candidate)
+    candidate_ms = statistics.median(authoritative_candidate) if authoritative_candidate else worker_candidate_ms
     baseline_ms = statistics.median(authoritative_baseline)
     root_candidate = max(0.0, root_walls["candidate"] - overhead)
     root_baseline = max(0.0, root_walls["baseline"] - overhead)

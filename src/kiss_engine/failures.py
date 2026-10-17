@@ -3,8 +3,7 @@
 import json
 
 from .harness import build_harness, parse_result
-from .runtime import Ledger, Sandboxes, deadline, load_secrets
-from .smoke import checked
+from .runtime import Ledger, Sandboxes, checked, deadline, load_secrets
 
 FIXTURES = [
     ("incorrect", "def count_pairs(a,b,lower,upper):\n    return 0\n", "test_failure"),

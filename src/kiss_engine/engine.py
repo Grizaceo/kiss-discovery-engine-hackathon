@@ -11,8 +11,7 @@ from dataclasses import asdict, dataclass
 
 from .harness import build_harness, parse_result
 from .mercury import APPROACHES, TASK, GenerationError, Mercury
-from .runtime import Ledger, Sandboxes, deadline, load_secrets, projection
-from .smoke import checked
+from .runtime import Ledger, Sandboxes, checked, deadline, load_secrets, projection
 
 
 @dataclass
@@ -217,6 +216,7 @@ def run_search(limits=None):
                                 candidate_id=cid,
                                 duplicate_of=seen[sha],
                             )
+                            ledger.artifact("summary.json", summary)
                             continue
                         seen[sha] = cid
                         physical_parent = (

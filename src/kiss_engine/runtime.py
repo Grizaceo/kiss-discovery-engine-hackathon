@@ -134,6 +134,13 @@ def projection(box):
     }
 
 
+def checked(adapter, box, command, args=None, timeout=40):
+    result = adapter.exec(box, command, args, timeout=timeout)
+    if result.get("exit_code") != 0:
+        raise RuntimeError(f"Remote command failed: {result}")
+    return result["standard_output"]
+
+
 class Sandboxes:
     def __init__(self, key, ledger, max_created=8, op_timeout=60):
         self.client = Client(api_key=key, timeout=20, retry=RetryOptions(max_retries=0))
@@ -296,7 +303,7 @@ class Sandboxes:
         )
         r = dataclasses.asdict(response.result)
         for key in ("stdout", "stderr", "standard_output", "standard_error"):
-            if len(r.get(key, "")) > 100000:
+            if len(r.get(key) or "") > 100000:
                 r[key] = r[key][:100000]
                 r["output_truncated"] = True
         self.ledger.event("exec_result", sandbox_id=box.id, **r)

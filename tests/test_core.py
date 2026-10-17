@@ -11,7 +11,7 @@ from kiss_engine.engine import Limits, rank
 from kiss_engine.harness import build_harness, extract_worker_source, parse_result
 from kiss_engine.mercury import GenerationError, Mercury, validate_code
 from kiss_engine.report import render_report, speed_verdict
-from kiss_engine.runtime import Ledger, Sandboxes, load_secrets
+from kiss_engine.runtime import Ledger, Sandboxes, checked, load_secrets
 from kiss_engine.smoke import expect
 from kiss_engine.web import list_runs, platform_evidence
 
@@ -791,3 +791,63 @@ def test_ledger_artifact_writes_atomically_via_replace(tmp_path, monkeypatch):
     assert calls[0][1] == ledger.path / "summary.json"
     assert not list(ledger.path.glob("*.tmp"))
     assert "SECRET_TOKEN" not in (ledger.path / "summary.json").read_text()
+
+
+def test_k19_duplicate_saves_summary_none_output_checked_and_harness_ast(
+    tmp_path, monkeypatch
+):
+    from dataclasses import dataclass
+    from types import SimpleNamespace
+
+    monkeypatch.chdir(tmp_path)
+    engine = install_offline_search_fakes(monkeypatch)
+
+    class DupMercury:
+        def __init__(self, *args, **kwargs):
+            self.calls = 0
+
+        def generate(self, *args, **kwargs):
+            self.calls += 1
+            return {
+                "code": FAKE_CODE,
+                "code_sha256": "SAME_HASH",
+                "approach": "offline fixture",
+                "provider": "OFFLINE_TEST_FAKE",
+            }
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(engine, "Mercury", DupMercury)
+    result = engine.run_search(
+        engine.Limits(rounds=1, width=2, max_candidates=2, max_sandboxes=3)
+    )
+    assert result["candidates"][1]["status"] == "duplicate"
+    saved = json.loads(
+        (tmp_path / "runs" / result["run_id"] / "summary.json").read_text()
+    )
+    assert saved["candidates"][1]["status"] == "duplicate"
+
+    @dataclass
+    class FakeResult:
+        exit_code: int = 0
+        stdout: str | None = None
+        stderr: str | None = None
+        standard_output: str | None = "ok"
+        standard_error: str | None = None
+
+    adapter = Sandboxes.__new__(Sandboxes)
+    adapter.ledger = Ledger("exec-none", root=tmp_path)
+    adapter.op = lambda name, fn, **kw: SimpleNamespace(result=FakeResult())
+    box = SimpleNamespace(
+        id="sb-1", run_command=lambda *a, **k: SimpleNamespace(result=FakeResult())
+    )
+    out = adapter.exec(box, "echo")
+    assert out["stdout"] is None
+    assert checked(adapter, box, "echo") == "ok"
+
+    source = build_harness(7)
+    tree = ast.parse(source)
+    assert tree is not None
+    assert "authoritative_candidate.append(net if net > 0 else wall)" not in source
+    assert "authoritative_candidate.append(net)" in source

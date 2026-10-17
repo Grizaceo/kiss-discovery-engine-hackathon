@@ -2,14 +2,7 @@
 
 import json
 
-from .runtime import Ledger, Sandboxes, deadline, load_secrets, projection
-
-
-def checked(adapter, box, command, args=None, timeout=40):
-    result = adapter.exec(box, command, args, timeout=timeout)
-    if result.get("exit_code") != 0:
-        raise RuntimeError(f"Remote command failed: {result}")
-    return result["standard_output"]
+from .runtime import Ledger, Sandboxes, checked, deadline, load_secrets, projection
 
 
 def expect(actual, wanted, what):
