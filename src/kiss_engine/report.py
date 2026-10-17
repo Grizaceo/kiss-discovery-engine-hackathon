@@ -63,7 +63,9 @@ def _timing_method(f):
             + agr_txt
         )
     if timed_where:
-        return "Historical worker self-timing (diagnostic only; pre-supervisor-timing run)"
+        return (
+            "Historical worker self-timing (diagnostic only; pre-supervisor-timing run)"
+        )
     return "Not benchmarked (stopped before benchmark phase)"
 
 

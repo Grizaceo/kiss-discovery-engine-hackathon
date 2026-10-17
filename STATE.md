@@ -28,4 +28,4 @@ Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459
 ## Next
 Ready for demo and external submission gates. Public GitHub push, public static report/demo URL, and submission to `https://projects.dev/leaderboard` (code `CreateOS-2026`, stack URL `https://projects.dev/s#v1:createos~project`) + the Discord deadline link require explicit user authorization.
 
-Last verified: 2026-10-17T18:55:00-03:00. Final commands: `ruff check src tests` clean, 73 offline tests passed, `kiss audit` 34/34 destroyed; UI/report verified visually and via HTTP.
+Last verified: 2026-10-17T19:15:00-03:00. Block 0 (K21): applied `ruff format src tests` (`src/kiss_engine/report.py` reformatted); `ruff check src tests` clean, 73 offline tests passed; Blocks 1–7 pending.
