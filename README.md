@@ -51,7 +51,7 @@ Ratios compare supervisor-measured candidate median against the same-VM trusted 
 
 ## Try it without credentials
 
-Run the offline test suite (fakes only; no network calls, no host execution of generated/fixture code) and inspect the curated static evidence bundle:
+Run the offline test suite (fakes only; no network calls, no host execution of generated/fixture code) and inspect the curated static evidence bundle. The dashboard browser test drives headless Chromium and runs only when Chromium and Node ≥ 22 are installed (otherwise it is skipped):
 
 ```sh
 uv sync --locked --group dev

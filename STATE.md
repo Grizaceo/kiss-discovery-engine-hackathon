@@ -6,7 +6,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
 - Review fixes verified: untrusted PID ignored; authoritative supervisor timing and separate trusted baseline; finite timing checks; input mutation detection; memory cap; root-only supervisor file.
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
-- 91 offline tests passed (latest run: pre-publish Block A). No generated/fixture solution run on host.
+- 94 offline tests passed (latest run: Block D dashboard fix). No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
 - Added `docs/CREATEOS_REFERENCE.md`: verified CreateOS ecosystem reference (CLI, agent plugins, six SDKs, quotas, canonical links) carried over from the event preparation workspace; no code change.
 - Added `docs/CREATEOS_GUIDE.html`: full CreateOS usage guide (Spanish) built from the official documentation corpus (171 pages; live, self-contained HTML); carried over from the event preparation workspace; no code change.
@@ -59,3 +59,9 @@ Last verified: 2026-10-17T20:14-03:00 (pre-publish Block A: ruff format/check cl
 - Public repo: https://github.com/Grizaceo/kiss-discovery-engine-hackathon (created 2026-10-17 ~20:17 Chile with `gh repo create --public --source=. --remote=origin --push`). Read-back: `visibility: PUBLIC`, description set, `git ls-remote origin main` = local HEAD `baa8d75ce38c1033e7868460b35b1698256772fa`, anonymous `curl` HTTP 200.
 - GitHub Pages (legacy, `main` `/`, `.nojekyll`): https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/ HTTP 200 at 20:18:17 Chile (third 15 s poll); build `status: built` for commit `baa8d75`. Read-back: `evidence/search-20261017T215022-01459f/report.html` 200 (shows the K02 view correction), `evidence/captures-20261017/report-search-20261017T215022-01459f.png` 200 `image/png`.
 - Only static files are published; `kiss serve` stays loopback-only. No force push, history rewrite, tunnel, plan change or payment.
+
+## Dashboard reliability fix (Block D, 2026-10-17 ~20:30-20:42 Chile)
+- Reported by Cristóbal: "View candidate code & explanation" closed by itself. Root cause: `refresh()` rebuilt `#runs` every 2.5 s, recreating every `<details>` closed. Fix (`web.py` inline JS only): open panes tracked by `run_id|candidate_id` key and restored, code/events scroll restored, DOM rebuilt only when `/api/runs` changes, per-run render isolation, 10 s fetch timeout and no overlapping refreshes.
+- `/report/<run_id>` now renders from the atomic `summary.json` checkpoint, so the report link works mid-run (`LIVE RUN IN PROGRESS`) instead of a 404 JSON before `report.html` exists.
+- New `tests/test_dashboard_e2e.py` + `tests/e2e/dashboard_e2e.mjs`: real headless Chromium (CDP, real mouse clicks) against an offline fixture server in a temp dir with faked `Popen` (no real run): 52 checks incl. panes open through live updates, scroll, report links/tabs, outage/recovery, launch/409/validation, no JS errors. Fails on the previous code (11 checks: panes closing, live report 404), passes on the fix. 94 tests total.
+- Real dashboard restarted on 127.0.0.1:8097 with the fix; read-only browser check against real `runs/`: 7 runs, 8 panes stay open after 3 refresh cycles, 7/7 reports 200, no JS errors; launch button never clicked.

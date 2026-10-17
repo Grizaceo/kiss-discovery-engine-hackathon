@@ -10,7 +10,7 @@ Created 2026-10-17 during the event. Paths under `runs/` are local and gitignore
 | Own-parent feedback and physical chaining | child prompt, summary, fork events in `search-20261017T215022-01459f` & `search-20261017T200437-128ee8` | code parent g0-c0; physical origin exactly its paused VM |
 | Distinct initial approaches and selection | `search-20261017T215022-01459f`, `search-20261017T195122-af1869`, `search-20261017T200300-4a7d42` | sorted-bisect/two-pointer, failures retained |
 | Incorrect/timeout/syntax/mutation/time-spoof | `fixtures-20261017T195514-b9747e` | 5/5 expected classifications (`timing-spoof` monkeypatches `time.perf_counter` → `protocol_error`) |
-| Generation/API errors, retry and configured caps | `uv run pytest -q` | 91 offline tests, explicit fakes |
+| Generation/API errors, retry and configured caps | `uv run pytest -q` | 94 offline tests, explicit fakes (incl. a headless-Chromium dashboard test) |
 | UI renders actual results and launches | Dedicated local Chromium DOM/API + visual screenshots | Passed; browser-created run 195854; updated UX verified |
 | Owned resources terminal | `audit-20261017T215138-6151e4` | 34/34 read back destroyed |
 
