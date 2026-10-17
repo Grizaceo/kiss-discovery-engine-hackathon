@@ -343,6 +343,9 @@ def run_search(limits=None):
                 previous = parent
                 parent = winner
                 summary["best_candidate_id"] = winner["candidate_id"]
+                for cand in selectable:
+                    if cand["candidate_id"] != winner["candidate_id"]:
+                        cand["selection_reason"] = None
                 winner["selection_reason"] = (
                     "correctness/test count first; fastest supervisor-measured median among tied passing candidates; noisy finite-run estimate"
                 )
@@ -395,8 +398,17 @@ def run_search(limits=None):
                 )
         for candidate in summary["candidates"]:
             if not candidate.get("selection_reason"):
+                f = candidate.get("feedback") or {}
+                passed = f.get("tests_passed", 0)
+                total = f.get("total", 60)
+                ms = f.get("candidate_ms")
+                ms_note = (
+                    f", median={ms:.3f}ms"
+                    if isinstance(ms, (int, float)) and math.isfinite(ms)
+                    else ""
+                )
                 candidate["selection_reason"] = (
-                    f"not selected: status={candidate['status']}; "
+                    f"not selected: status={candidate['status']} ({passed}/{total} tests{ms_note}); "
                     f"best={summary['best_candidate_id']}; correctness before measured speed"
                 )
                 ledger.event(

@@ -9,12 +9,17 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from .engine import Limits
+from .report import render_report
 
 PAGE = """<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KISS Discovery Engine</title><style>
-:root{color-scheme:dark}*{box-sizing:border-box}body{background:#0a1019;color:#e6edf3;font:15px/1.55 system-ui;max-width:1180px;margin:40px auto;padding:0 24px}h1{font-size:44px;letter-spacing:-1.5px;margin-bottom:0}.overline{color:#50deb3;text-transform:uppercase;letter-spacing:3px;font-size:12px}p,small{color:#9eadbd}.layout{display:grid;grid-template-columns:310px 1fr;gap:22px;align-items:start}section,.run{border:1px solid #273646;border-radius:16px;padding:22px;background:#101925;margin:18px 0}button,a.button{background:#69e8ba;color:#082217;border:0;border-radius:9px;padding:12px 18px;font-weight:750;cursor:pointer}button:disabled{opacity:.4;cursor:wait}label{display:block;margin:14px 0;color:#b9c8d5}input,select{width:100%;padding:9px;margin-top:4px;background:#0a111c;color:#e8f1f7;border:1px solid #3b4a5e;border-radius:7px}a{color:#7dc9ff}pre{font:12px/1.5 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:250px;overflow:auto}.run h3{margin-top:0;word-break:break-word}.badge{padding:3px 8px;border:1px solid #405066;border-radius:20px;font-size:12px;color:#a8edd1}.candidate{border-left:2px solid #3a5d62;padding-left:12px;margin:14px 0}.error{color:#ffac9c}#job{min-height:30px}summary{cursor:pointer}@media(max-width:760px){.layout{grid-template-columns:1fr}h1{font-size:34px}}
-</style><p class="overline">CreateOS × Stripe Projects · hackathon build</p><h1>KISS Discovery Engine</h1><p>Search for working code. Keep the evidence.<br>Mercury 2.5 generates. Real microVM forks execute. Tests decide.</p><div class="layout"><section><h2>New experiment</h2><form id="form"><label>Task<select><option>count_pairs · T1b</option></select></label><small>Count cross-list index pairs whose sum lies within inclusive bounds. Duplicates count; inputs stay unchanged. Fixed, explicit MVP task.</small><label>Rounds<input id="rounds" type="number" min="1" max="3" value="2"></label><label>Initial approaches<input id="width" type="number" min="1" max="2" value="2"></label><label>Candidate cap<input id="cap" type="number" min="1" max="5" value="3"></label><button id="start">Run real experiment</button></form><p id="job"></p><small>Local only. Existing credits, no plan changes. Up to 6 sandbox creations and 8 model HTTP attempts. Search ≤ 6 min by default; cleanup is separately bounded. No invented data, no silent fallback.</small></section><main><section><h2>Experiment ledger</h2><small>Code lineage ≠ physical VM lineage. Click a report for actual code, feedback, raw execution and cleanup.</small></section><div id="runs">Loading local evidence…</div></main></div><script>
+:root{color-scheme:dark}*{box-sizing:border-box}body{background:#0a1019;color:#e6edf3;font:15px/1.55 system-ui;max-width:1220px;margin:32px auto;padding:0 24px}h1{font-size:40px;letter-spacing:-1.2px;margin:4px 0 8px}h2{margin:0 0 10px;font-size:20px}.overline{color:#50deb3;text-transform:uppercase;letter-spacing:3px;font-size:12px;margin:0}p,small{color:#9eadbd;margin:6px 0}.layout{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start}section,.run{border:1px solid #273646;border-radius:16px;padding:20px;background:#101925;margin:14px 0}.run.live-run{border-color:#d29922;background:#171f2c}button,a.button{background:#69e8ba;color:#082217;border:0;border-radius:9px;padding:11px 18px;font-weight:750;cursor:pointer;width:100%;margin-top:8px}button:disabled{opacity:.4;cursor:wait}label{display:block;margin:12px 0;color:#b9c8d5;font-size:14px}input,select{width:100%;padding:8px;margin-top:4px;background:#0a111c;color:#e8f1f7;border:1px solid #3b4a5e;border-radius:7px}a{color:#7dc9ff}.report-link{display:inline-block;margin:8px 0;font-weight:650}pre{font:12px/1.5 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;background:#090f17;padding:12px;border-radius:8px;border:1px solid #223041}.run h3{margin:6px 0;word-break:break-word;font-size:19px}.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.badge{padding:3px 9px;border:1px solid #405066;border-radius:20px;font-size:12px;color:#a8edd1;background:#132530}.badge.hist{color:#b8c7d9;background:#182230;border-color:#344558}.badge.live{color:#ffd885;background:#4b3409;border-color:#9e6a03}.badge.warn{color:#ffac9c;background:#3b1d22;border-color:#7d333d}.badge.win{color:#a0f0be;background:#114932;border-color:#2ea043}.candidate{border-left:3px solid #3a5d62;padding:8px 0 8px 14px;margin:14px 0;background:#0c141f;border-radius:0 10px 10px 0}.candidate.winner{border-left-color:#50deb3;background:#0d1a22}.candidate p,.candidate small{margin:4px 0;display:block}.error{color:#ffac9c}#job{min-height:26px;font-weight:600;color:#ffd885}summary{cursor:pointer;color:#9ecbff;font-size:13px;margin-top:4px}.contract{font-size:13px;background:#0b121c;border:1px solid #223244;border-radius:10px;padding:10px 12px;margin:10px 0}code{font-family:monospace;color:#c9e1ff}@media(max-width:820px){.layout{grid-template-columns:1fr}h1{font-size:32px}}
+</style><p class="overline">CreateOS × Stripe Projects · hackathon build</p><h1>KISS Discovery Engine</h1><p>KISS explores code solutions in real microVM forks and preserves evidence of what worked, what failed, and where each attempt came from.<br><b>Mercury 2.5</b> (Inception direct) generates · <b>CreateOS Sandbox</b> pauses &amp; forks · <b>Trusted supervisor</b> tests &amp; times.</p><div class="layout"><section><h2>1. Problem &amp; contract</h2><div class="contract"><b>Task T1b:</b> <code>count_pairs(a, b, lower, upper) -&gt; int</code><br><small>• Count index pairs <code>(i, j)</code> across two lists with <code>lower &lt;= a[i] + b[j] &lt;= upper</code> (inclusive).<br>• Duplicates count by index; empty lists or <code>lower &gt; upper</code> return <code>0</code>.<br>• Caller inputs must not be mutated; Python 3 stdlib only; <code>|v| &lt;= 10^9</code>, <code>len &lt;= 10^6</code>.<br>• <b>Selection rule:</b> 60 hidden correctness tests first; ties broken by supervisor-measured median across 3×20,000-item datasets (minus same-dataset null roundtrip overhead).</small></div><h2>2. Launch bounded run</h2><form id="form"><label>Task<select><option>count_pairs · T1b (fixed MVP)</option></select></label><label>Rounds (Gen 0 initial + Gen 1+ revisions)<input id="rounds" type="number" min="1" max="3" value="2"></label><label>Initial approaches in Gen 0 (sorted-bisect, two-pointer)<input id="width" type="number" min="1" max="2" value="2"></label><label>Total candidate cap<input id="cap" type="number" min="1" max="5" value="3"></label><button id="start">Run real experiment</button></form><p id="job"></p><small>Loopback only. Uses existing credits; no plan changes. Capped at ≤6 sandboxes, ≤8 Mercury calls, ≤6 min search wall time + bounded cleanup. Candidate code never executes on the host.</small></section><main><section><h2>Experiment ledger (live status vs. historical artifacts)</h2><small><b>Logical code lineage</b> (which parent's code &amp; feedback prompted Mercury) is tracked separately from <b>physical microVM fork lineage</b> (which paused CreateOS VM was forked). Expand any candidate below for code, explanation, timings and errors, or open its standalone report.</small></section><div id="runs">Loading local evidence…</div></main></div><script>
 const $=s=>document.querySelector(s);function node(tag,text,cls){let e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
-async function refresh(){try{const r=await fetch('/api/runs');const d=await r.json();$('#runs').replaceChildren();for(const s of d.runs){let box=node('section',undefined,'run');box.append(node('h3',s.run_id));box.append(node('span',s.status+' · '+(s.stop_reason||'in progress'),'badge'));if(s.error)box.append(node('p',s.error,'error'));box.append(node('p','Best: '+(s.best_candidate_id||'not selected')));for(const c of s.candidates||[]){let e=node('div',undefined,'candidate');e.append(node('b',(c.parent_candidate_id||'∅')+' → '+c.candidate_id+' · '+c.status));e.append(node('p',(c.approach||c.requested_approach||'')+' · tests '+(c.feedback?.tests_passed??'—')+'/'+(c.feedback?.total??'—')));e.append(node('small','VM '+(c.sandbox_id||'pending')+' ← '+(c.forked_from||'pending')));box.append(e)}if(s.warnings?.length)box.append(node('p',s.warnings.join(' · '),'error'));let a=node('a','Open evidence report ↗');a.href='/report/'+encodeURIComponent(s.run_id);a.target='_blank';a.rel='noopener';box.append(a);let det=node('details');det.append(node('summary','Latest events'));det.append(node('pre',JSON.stringify(s.latest_events||[],null,2)));box.append(det);$('#runs').append(box)}$('#start').disabled=d.active;$('#job').textContent=d.active?'A real bounded run is active. States refresh automatically.':''}catch(e){$('#job').textContent='Local service unavailable: '+e.message}}
+const STOP_DESC={max_rounds:'all configured rounds completed',max_candidates:'candidate cap reached',max_model_calls:'Mercury call cap reached',max_sandboxes:'sandbox creation cap reached',performance_target_met:'target threshold met',no_evaluable_candidates:'no candidate produced a valid evaluation',time_limit:'wall-clock deadline reached',cancelled:'cancelled'};
+function fmtMs(v){return typeof v==='number'&&Number.isFinite(v)?v.toFixed(3)+' ms':'—'}
+function timingTag(c){const tw=c?.feedback?.benchmark?.timed_where||'';if(tw.includes('supervisor'))return 'supervisor-timed';if(tw)return 'historical worker-timed (diagnostic)';return ''}
+function selectionNote(c,s){if(c.selection_reason)return c.selection_reason;if(s.status==='running')return 'pending selection (round in progress)';if(s.best_candidate_id&&c.candidate_id===s.best_candidate_id)return 'selected as best candidate (60/60 correctness first, then lowest median ms)';const f=c.feedback||{};const m=typeof f.candidate_ms==='number'?`, ${f.candidate_ms.toFixed(3)} ms`:'';return `not selected (historical record): status=${c.status} (${f.tests_passed??'—'}/${f.total??60} tests${m}); best=${s.best_candidate_id||'none'} ranked ahead`}
+async function refresh(){try{const r=await fetch('/api/runs');const d=await r.json();$('#runs').replaceChildren();for(const s of d.runs){const isLive=s.status==='running';let box=node('section',undefined,'run'+(isLive?' live-run':''));let badges=node('div',undefined,'badges');badges.append(node('span',isLive?'LIVE · IN PROGRESS':'HISTORICAL · '+(s.status||'').toUpperCase(),'badge '+(isLive?'live':'hist')));const stopTxt=s.stop_reason?(s.stop_reason+(STOP_DESC[s.stop_reason]?' ('+STOP_DESC[s.stop_reason]+')':'')):'in progress';badges.append(node('span','stop: '+stopTxt,'badge hist'));const tTag=(s.candidates||[]).map(timingTag).find(Boolean);if(tTag)badges.append(node('span',tTag,'badge '+(tTag.includes('historical')?'warn':'hist')));const res=s.resources||[];if(res.length){const dest=res.filter(x=>x.status==='destroyed').length;badges.append(node('span',`VMs cleaned: ${dest}/${res.length}`,'badge hist'))}box.append(badges);box.append(node('h3',s.run_id));box.append(node('small',`UTC: ${s.started_at||'—'} → ${s.finished_at||(isLive?'running now':'—')} · Mercury calls: ${s.model_calls??'—'}`));if(s.error)box.append(node('p','Run error: '+s.error,'error'));box.append(node('p','Selected winner: '+(s.best_candidate_id||'none (no passing/evaluable candidate)')+' — rule: correctness (60/60) before measured median ms'));for(const c of s.candidates||[]){const isWin=s.best_candidate_id&&c.candidate_id===s.best_candidate_id;let e=node('div',undefined,'candidate'+(isWin?' winner':''));const genLbl=c.parent_candidate_id?`Gen ${c.generation??1} (revision of ${c.parent_candidate_id})`:`Gen ${c.generation??0} (initial)`;let head=node('b',`${genLbl}: ${c.parent_candidate_id||'∅'} → ${c.candidate_id} · ${c.status}`);e.append(head);if(isWin){e.append(document.createTextNode(' '));e.append(node('span','SELECTED WINNER','badge win'))}const f=c.feedback||{};const msTxt=typeof f.candidate_ms==='number'?` · median ${fmtMs(f.candidate_ms)} vs baseline ${fmtMs(f.baseline_ms)}`:'';const agr=f.benchmark?.agreement;const agrTxt=agr===false?' · [root cross-check agreement: false]':agr===true?' · [root cross-check agreement: true]':'';e.append(node('p',`Approach: ${c.approach||c.requested_approach||'—'} · Tests: ${f.tests_passed??'—'}/${f.total??'—'}${msTxt}${agrTxt}`));let vmTxt;if(c.sandbox_id){vmTxt=`Physical microVM: ${c.sandbox_id} ← forked from paused VM ${c.forked_from||'base'}`}else if(isLive&&(c.status==='generating'||c.status==='evaluating')){vmTxt='Physical microVM: pending (generation/evaluation in progress)'}else{vmTxt=`Physical microVM: none (stopped at ${c.status} before VM fork)`}e.append(node('small',vmTxt));e.append(node('small','Selection: '+selectionNote(c,s)));const errDetail=f.detail||(f.errors&&f.errors[0]?(f.errors[0].candidate_error||JSON.stringify(f.errors[0])):'');if(errDetail)e.append(node('small','Error/detail: '+errDetail,'error'));if(c.code||c.explanation){let cdet=node('details');cdet.append(node('summary','View candidate code & explanation'));if(c.explanation)cdet.append(node('small','Explanation: '+c.explanation));if(c.code)cdet.append(node('pre',c.code));e.append(cdet)}box.append(e)}if(s.warnings?.length)box.append(node('p',s.warnings.join(' · '),'error'));let a=node('a','Open full standalone evidence report ↗','report-link');a.href='/report/'+encodeURIComponent(s.run_id);a.target='_blank';a.rel='noopener';box.append(a);let det=node('details');det.append(node('summary','Latest append-only events'));det.append(node('pre',JSON.stringify(s.latest_events||[],null,2)));box.append(det);$('#runs').append(box)}$('#start').disabled=d.active;$('#job').textContent=d.active?'LIVE: A real bounded experiment is executing now. States refresh every 2.5s.':'Idle: no experiment currently running. Showing saved local runs below.'}catch(e){$('#job').textContent='Local service unavailable: '+e.message}}
 $('#form').addEventListener('submit',async e=>{e.preventDefault();$('#start').disabled=true;try{const config={rounds:Number($('#rounds').value),width:Number($('#width').value),max_candidates:Number($('#cap').value)};const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(config)});const d=await r.json();if(!r.ok)throw new Error(d.error);$('#job').textContent='Started real job';await refresh()}catch(e){$('#job').textContent=e.message;$('#start').disabled=false}});refresh();setInterval(refresh,2500);
 </script></html>"""
 
@@ -40,17 +45,33 @@ def list_runs(root):
                 c["candidate_id"]: dict(c) for c in summary.get("candidates", [])
             }
             for event in events if summary.get("status") == "running" else []:
+                if event.get("event") == "selection" and event.get("candidate_id"):
+                    summary["best_candidate_id"] = event["candidate_id"]
+                    if event["candidate_id"] in candidates:
+                        candidates[event["candidate_id"]]["selection_reason"] = (
+                            event.get("reason")
+                        )
+                    continue
                 cid = event.get("candidate_id")
                 if not cid:
                     continue
                 if event["event"] == "candidate_started":
-                    candidates[cid] = {
-                        k: v
-                        for k, v in event.items()
-                        if k not in {"run_id", "event", "timestamp"}
-                    }
+                    candidates.setdefault(
+                        cid,
+                        {
+                            k: v
+                            for k, v in event.items()
+                            if k not in {"run_id", "event", "timestamp"}
+                        },
+                    )
                 elif cid in candidates:
-                    if event["event"] == "candidate_evaluating":
+                    if event["event"] == "generation_completed":
+                        candidates[cid].update(
+                            approach=event.get("approach"),
+                            code_sha256=event.get("code_sha256"),
+                            generation_ms=event.get("generation_ms"),
+                        )
+                    elif event["event"] == "candidate_evaluating":
                         candidates[cid].update(
                             status="evaluating",
                             sandbox_id=event["sandbox_id"],
@@ -63,7 +84,7 @@ def list_runs(root):
                     elif event["event"] == "candidate_generation_failed":
                         candidates[cid]["status"] = event["status"]
             summary["candidates"] = [
-                {k: v for k, v in c.items() if k not in {"code", "execution"}}
+                {k: v for k, v in c.items() if k != "execution"}
                 for c in candidates.values()
             ]
             summary["latest_events"] = [
@@ -115,11 +136,13 @@ def serve(port=8097):
                 return self.send(200, PAGE, "text/html")
             if path == "/api/runs":
                 process = job["process"]
+                runs = list_runs(root)
                 return self.send(
                     200,
                     {
-                        "active": process is not None and process.poll() is None,
-                        "runs": list_runs(root),
+                        "active": (process is not None and process.poll() is None)
+                        or any(r.get("status") == "running" for r in runs),
+                        "runs": runs,
                     },
                 )
             if path.startswith("/report/"):
@@ -131,7 +154,17 @@ def serve(port=8097):
                 ):
                     return self.send(400, {"error": "Invalid run ID"})
                 report = root / run_id / "report.html"
+                summary_file = root / run_id / "summary.json"
                 if report.is_file():
+                    if summary_file.is_file():
+                        try:
+                            return self.send(
+                                200,
+                                render_report(json.loads(summary_file.read_text())),
+                                "text/html",
+                            )
+                        except (OSError, ValueError, KeyError):
+                            pass
                     return self.send(200, report.read_text(), "text/html")
                 return self.send(
                     404, {"error": "Report not available yet; run is active or unknown"}

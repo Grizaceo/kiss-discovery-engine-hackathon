@@ -17,16 +17,15 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - `runs/search-20261017T195122-af1869/`: two approaches + revision; 60/60, 5/60, 60/60. Historical worker-only timings are NOT final authoritative scoring.
 - `runs/search-20261017T195854-92454c/`: real browser-launched run; truncated child preserved.
 - `runs/search-20261017T200300-4a7d42/`: two correct initial candidates, invalid child response preserved honestly.
-- `runs/search-20261017T200437-128ee8/`: final supervisor-timed chain; parent/child 60/60, 6.515/6.587 ms, no improvement claim. Three resources destroyed, two real Mercury calls, stop=max_rounds.
-- `runs/audit-20261017T205226-221420/summary.json`: 30/30 owned resources destroyed, including early slow cleanup. 16,690 provider-reported tokens across 13 usage events. Credit/currency consumption not observable, not inferred.
-- Chromium DOM verified rendering and real run initiation. Dashboard http://127.0.0.1:8097.
+- `runs/search-20261017T200437-128ee8/`: supervisor-timed 1-width chain; parent/child 60/60, 6.515/6.587 ms, no improvement claim. Three resources destroyed, two real Mercury calls, stop=max_rounds.
+- `runs/search-20261017T215022-01459f/`: final complete bounded demo chain (`rounds=2, width=2, max_candidates=3, max_sandboxes=4, max_model_calls=5, search_seconds=300, benchmark_n=20000`). Base `sb-01m55xge5pz50x960atf55199r` → `g0-c0` (`sorted-bisect`, VM `sb-01m55xgnr1xme51d4bab9bnnvs`, 60/60, `6.942 ms`) & `g0-c1` (`two-pointer`, VM `sb-01m55xh7htvnf8cgee3gxfwqds`, 60/60, `9.667 ms`) → `g0-c0` selected after Round 0 → `g1-c0` (`parent-feedback-revision`, VM `sb-01m55xhp139bt4r3m2hjq99ewz` physically forked from `g0-c0`'s paused VM, 60/60, `6.553 ms`, selected as final best; all 3 candidates have explicit selection/non-selection reasons; `agreement: false` retained honestly; 3 Mercury calls; 4/4 resources destroyed).
+- `runs/audit-20261017T215138-6151e4/summary.json` (superseding `audit-20261017T205226-221420`): 34/34 owned resources destroyed, `unresolved: []`. 20,350 provider-reported tokens across 16 usage events (prompt: 11,271; completion: 9,079). Credit/currency consumption not observable, not inferred.
+- Chromium DOM and visual screenshots (`runs/captures-20261017/`) verified rendering, live vs historical run state, task contract, dual lineage, timings, errors and selection reasons. Dashboard http://127.0.0.1:8097.
 
 ## Closing
-Final lint and build passed; source distribution and wheel checked for private state/known secrets. Scoped known-secret scan and dashboard/private-path/Origin checks passed. Independent review complete. Local implementation commit ready after final verification. No public exposure, push, submission, plan change or payment. No sandbox intentionally active.
+Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459f`), read-only resource reconciliation (`34/34 destroyed`), presentation/submission materials (`docs/DEMO.md`), offline tests and lint completed. No public exposure, push, submission, plan change or payment. No sandbox active.
 
 ## Next
-Finish verification/commit and hand off for refinement. Public delivery requires separate permission. Do not repeatedly spend credits to manufacture a better improvement story.
+Ready for demo and external submission gates. Public GitHub push, public static report/demo URL, and submission to `https://projects.dev/leaderboard` (code `CreateOS-2026`, stack URL `https://projects.dev/s#v1:createos~project`) + the Discord deadline link require explicit user authorization.
 
-Last verified: 2026-10-17T17:53:23.547050-03:00. Final commands: ruff check clean, 73 tests passed, sdist + wheel built; UI/report/private-route/Origin checks passed.
-
-Final closeout also verified a clean checkout with `uv sync --locked --group dev`, offline tests, lint and CLI help. Every new candidate now receives an explicit selection/non-selection reason (including duplicates and generation failures); historical evidence is not rewritten.
+Last verified: 2026-10-17T18:55:00-03:00. Final commands: `ruff check src tests` clean, 73 offline tests passed, `kiss audit` 34/34 destroyed; UI/report verified visually and via HTTP.

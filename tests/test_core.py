@@ -303,14 +303,33 @@ def test_dashboard_reflects_real_event_states(tmp_path):
     path = tmp_path / "search-fixture"
     path.mkdir()
     (path / "summary.json").write_text(
-        json.dumps({"run_id": "search-fixture", "status": "running", "candidates": []})
+        json.dumps(
+            {
+                "run_id": "search-fixture",
+                "status": "running",
+                "candidates": [
+                    {
+                        "candidate_id": "g0-c0",
+                        "status": "correct",
+                        "approach": "sorted-bisect",
+                        "selection_reason": "selected in round 0",
+                    }
+                ],
+            }
+        )
     )
     events = [
         {
             "event": "candidate_started",
-            "candidate_id": "a",
+            "candidate_id": "g0-c0",
             "status": "generating",
             "generation": 0,
+        },
+        {
+            "event": "candidate_started",
+            "candidate_id": "a",
+            "status": "generating",
+            "generation": 1,
         },
         {
             "event": "candidate_evaluating",
@@ -321,8 +340,11 @@ def test_dashboard_reflects_real_event_states(tmp_path):
     ]
     (path / "events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events))
     rows = list_runs(tmp_path)
-    assert rows[0]["candidates"][0]["status"] == "evaluating"
-    assert rows[0]["candidates"][0]["sandbox_id"] == "FAKE_VM"
+    by_id = {c["candidate_id"]: c for c in rows[0]["candidates"]}
+    assert by_id["g0-c0"]["approach"] == "sorted-bisect"
+    assert by_id["g0-c0"]["selection_reason"] == "selected in round 0"
+    assert by_id["a"]["status"] == "evaluating"
+    assert by_id["a"]["sandbox_id"] == "FAKE_VM"
 
 
 def test_truncated_generation_retries_within_explicit_budget(tmp_path):
