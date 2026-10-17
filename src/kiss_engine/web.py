@@ -216,16 +216,18 @@ def platform_evidence(root):
     return out
 
 
-def serve(port=8097):
-    root = Path.cwd() / "runs"
-    root.mkdir(exist_ok=True, mode=0o700)
-    job = {"process": None, "log": None}
-    lock = threading.Lock()
-    allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+def make_handler(root, port, job=None, lock=None):
+    root = Path(root)
+    job = job if job is not None else {"process": None, "log": None}
+    lock = lock or threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
+
+        def _allowed_hosts(self):
+            p = port or self.server.server_port
+            return {f"127.0.0.1:{p}", f"localhost:{p}"}
 
         def send(self, status, data, ctype="application/json"):
             body = data.encode() if isinstance(data, str) else json.dumps(data).encode()
@@ -242,7 +244,7 @@ def serve(port=8097):
             self.wfile.write(body)
 
         def check_host(self):
-            if self.headers.get("Host") not in allowed_hosts:
+            if self.headers.get("Host") not in self._allowed_hosts():
                 self.send(403, {"error": "Loopback Host required"})
                 return False
             return True
@@ -298,7 +300,7 @@ def serve(port=8097):
             if urlsplit(self.path).path != "/api/run":
                 return self.send(404, {"error": "Not found"})
             origin = self.headers.get("Origin")
-            if origin not in {f"http://{h}" for h in allowed_hosts}:
+            if origin not in {f"http://{h}" for h in self._allowed_hosts()}:
                 return self.send(403, {"error": "Same-origin request required"})
             if self.headers.get("Content-Type") != "application/json":
                 return self.send(415, {"error": "JSON required"})
@@ -348,7 +350,16 @@ def serve(port=8097):
                 )
             return self.send(202, {"started": True, "task": "count_pairs"})
 
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    return Handler
+
+
+def serve(port=8097):
+    root = Path.cwd() / "runs"
+    root.mkdir(exist_ok=True, mode=0o700)
+    job = {"process": None, "log": None}
+    lock = threading.Lock()
+    handler_cls = make_handler(root, port, job=job, lock=lock)
+    server = ThreadingHTTPServer(("127.0.0.1", port), handler_cls)
     server.daemon_threads = True
     print(f"KISS dashboard http://127.0.0.1:{port} (loopback only)", flush=True)
     try:

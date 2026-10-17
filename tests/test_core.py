@@ -13,7 +13,7 @@ from kiss_engine.mercury import GenerationError, Mercury, validate_code
 from kiss_engine.report import render_report, speed_verdict
 from kiss_engine.runtime import Ledger, Sandboxes, checked, deadline, load_secrets
 from kiss_engine.smoke import expect
-from kiss_engine.web import list_runs, platform_evidence
+from kiss_engine.web import list_runs, make_handler, platform_evidence
 
 FAKE_CODE = "def count_pairs(a,b,lower,upper):\n    return 0\n"
 
@@ -882,3 +882,89 @@ def test_stale_running_run_shown_as_stale_without_rewriting_summary(tmp_path):
     rows = list_runs(tmp_path)
     assert rows[0]["status"] == "stale"
     assert json.loads((path / "summary.json").read_text())["status"] == "running"
+
+
+def test_web_handler_http_security_and_validation(tmp_path, monkeypatch):
+    import subprocess
+    import threading
+    from http.server import ThreadingHTTPServer
+    from types import SimpleNamespace
+
+    spawned = []
+
+    def fake_popen(args, **kwargs):
+        spawned.append(args)
+        return SimpleNamespace(poll=lambda: 0)
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
+    job = {"process": None, "log": None}
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(tmp_path, 0, job=job))
+    port = server.server_port
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base = f"http://127.0.0.1:{port}"
+    origin = base
+    try:
+        with httpx.Client() as client:
+            # Invalid Host -> 403
+            r = client.get(f"{base}/api/runs", headers={"Host": "evil.example:8097"})
+            assert r.status_code == 403
+
+            # POST without valid Origin -> 403
+            r = client.post(
+                f"{base}/api/run",
+                headers={"Content-Type": "application/json"},
+                content=b'{"rounds":1}',
+            )
+            assert r.status_code == 403
+            r = client.post(
+                f"{base}/api/run",
+                headers={
+                    "Origin": "http://evil.example",
+                    "Content-Type": "application/json",
+                },
+                content=b'{"rounds":1}',
+            )
+            assert r.status_code == 403
+
+            # Content-Type != application/json -> 415
+            r = client.post(
+                f"{base}/api/run",
+                headers={"Origin": origin, "Content-Type": "text/plain"},
+                content=b'{"rounds":1}',
+            )
+            assert r.status_code == 415
+
+            # Empty body or >1000 bytes -> 400
+            r = client.post(
+                f"{base}/api/run",
+                headers={"Origin": origin, "Content-Type": "application/json"},
+                content=b"",
+            )
+            assert r.status_code == 400
+            r = client.post(
+                f"{base}/api/run",
+                headers={"Origin": origin, "Content-Type": "application/json"},
+                content=b" " * 1001,
+            )
+            assert r.status_code == 400
+
+            # run-id with .. or without search- prefix -> 400
+            r = client.get(f"{base}/report/search-..bad")
+            assert r.status_code == 400
+            r = client.get(f"{base}/report/smoke-20261017T200218-804c8e")
+            assert r.status_code == 400
+
+            # Valid POST with monkeypatched Popen -> 202
+            r = client.post(
+                f"{base}/api/run",
+                headers={"Origin": origin, "Content-Type": "application/json"},
+                content=b'{"rounds":1,"width":1,"max_candidates":1}',
+            )
+            assert r.status_code == 202
+            assert len(spawned) == 1
+    finally:
+        server.shutdown()
+        server.server_close()
+        if job["log"]:
+            job["log"].close()
