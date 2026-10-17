@@ -57,12 +57,14 @@ def deadline(seconds):
     if seconds <= 0:
         raise TimeoutError("Operation deadline exhausted")
     old_handler = signal.getsignal(signal.SIGALRM)
+    current_remaining, _ = signal.getitimer(signal.ITIMER_REAL)
+    effective = min(seconds, current_remaining) if current_remaining > 0 else seconds
 
     def expired(*_):
         raise TimeoutError(f"Orchestrator deadline ({seconds}s)")
 
     signal.signal(signal.SIGALRM, expired)
-    old_timer = signal.setitimer(signal.ITIMER_REAL, seconds)
+    old_timer = signal.setitimer(signal.ITIMER_REAL, effective)
     start = time.monotonic()
     try:
         yield

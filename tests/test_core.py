@@ -11,7 +11,7 @@ from kiss_engine.engine import Limits, rank
 from kiss_engine.harness import build_harness, extract_worker_source, parse_result
 from kiss_engine.mercury import GenerationError, Mercury, validate_code
 from kiss_engine.report import render_report, speed_verdict
-from kiss_engine.runtime import Ledger, Sandboxes, checked, load_secrets
+from kiss_engine.runtime import Ledger, Sandboxes, checked, deadline, load_secrets
 from kiss_engine.smoke import expect
 from kiss_engine.web import list_runs, platform_evidence
 
@@ -851,3 +851,13 @@ def test_k19_duplicate_saves_summary_none_output_checked_and_harness_ast(
     assert tree is not None
     assert "authoritative_candidate.append(net if net > 0 else wall)" not in source
     assert "authoritative_candidate.append(net)" in source
+
+
+def test_nested_deadline_respects_outer_remaining_time():
+    import time
+
+    started = time.monotonic()
+    with pytest.raises(TimeoutError), deadline(1), deadline(3):
+        time.sleep(2)
+    elapsed = time.monotonic() - started
+    assert elapsed < 1.3

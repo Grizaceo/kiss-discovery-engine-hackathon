@@ -6,7 +6,7 @@ Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
 - Review fixes verified: untrusted PID ignored; authoritative supervisor timing and separate trusted baseline; finite timing checks; input mutation detection; memory cap; root-only supervisor file.
 - Counted bounded retries for 429, truncation and malformed structured responses, all attempts retained.
-- 86 offline tests passed. No generated/fixture solution run on host.
+- 87 offline tests passed. No generated/fixture solution run on host.
 - Final independent read-only review: no host-safety or false-success blocker found; hostile-code certification explicitly out of scope.
 - Added `docs/CREATEOS_REFERENCE.md`: verified CreateOS ecosystem reference (CLI, agent plugins, six SDKs, quotas, canonical links) carried over from the event preparation workspace; no code change.
 - Added `docs/CREATEOS_GUIDE.html`: full CreateOS usage guide (Spanish) built from the official documentation corpus (171 pages; live, self-contained HTML); carried over from the event preparation workspace; no code change.
@@ -36,4 +36,4 @@ Final UX refinements, bounded 2-approach demo run (`search-20261017T215022-01459
   3. **GitHub Pages activation** serving static `evidence/index.html` as `Deployed Project URL`.
   4. **Submission to `https://projects.dev/leaderboard` and Discord link** (requires 6-digit email OTP at submission time, plus confirmation of 22:00 vs 23:00 Chile deadline).
 
-Last verified: 2026-10-17T20:22:00-03:00. Block 7 / K19: saved `summary.json` before `continue` on duplicate candidates, guarded `None` output fields in `Sandboxes.exec`, moved `checked()` to `runtime.py`, and discarded `net <= 0` samples in `harness.py` instead of mixing raw wall time (AST-tested); 86 offline tests passed.
+Last verified: 2026-10-17T20:25:00-03:00. Block 7 / K13: nested `deadline()` caps timer to `min(seconds, outer_remaining)` via `signal.getitimer(signal.ITIMER_REAL)`; 87 offline tests passed.
