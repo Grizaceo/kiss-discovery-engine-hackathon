@@ -85,3 +85,7 @@ Last verified: 2026-10-17T20:14-03:00 (pre-publish Block A: ruff format/check cl
 - Leaderboard landscape (public API, read-only): 136 projects total; 56 CreateOS projects created Oct 17-18 UTC, 42 under `stripe-eindhoven-2026` (code from the organizers' later update; 45 entries in that filter), 10 under `createos-2026`, 4 without a code. KISS is listed as `setup` under `createos-2026`; Cristóbal may confirm with organizers that this code is counted.
 - Loopback dashboard stopped (no active run). Local commits `63aa902`, `8655ec9` and this one are not pushed; push only with Cristóbal's OK.
 - After a reboot (~23:35 Chile), the dashboard runs as systemd user unit `~/.config/systemd/user/kiss-dashboard.service` (enabled; user lingering is on, so it starts at boot): `.venv/bin/kiss serve --port 8097`, loopback only, `Restart=on-failure`, `KillMode=process` + `KillSignal=SIGINT` so stopping the server never kills a dashboard-launched run mid-cleanup. Verified active, 127.0.0.1:8097 only, `/` 200, `/api/runs` JSON, report 200, clean restart. Remove after judging: `systemctl --user disable --now kiss-dashboard.service && rm ~/.config/systemd/user/kiss-dashboard.service && systemctl --user daemon-reload`.
+
+## Results (2026-10-18)
+- Winners announced; KISS Discovery Engine was not among them. Judges' feedback, if any, still to be recorded here.
+- `kiss-dashboard.service` disabled, stopped and removed at Cristóbal's request (no active run; unit file and symlink gone, port 8097 free). Public repo and GitHub Pages evidence left as they are.
