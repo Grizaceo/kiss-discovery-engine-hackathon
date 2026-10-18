@@ -79,3 +79,8 @@ Last verified: 2026-10-17T20:14-03:00 (pre-publish Block A: ruff format/check cl
 - Video `demo-final-with-face.mp4` (2:30, 1080p): screen recording + TTS voiceover + Cristóbal's phone face as a picture-in-picture in the empty right margin. Ten frames reviewed: no secrets on screen, narration matches the run data. Google Form and X post submitted by Cristóbal.
 - Not pushed: `63aa902` (not authored by Devin; mentions a university Drive domain) and this commit; push only with Cristóbal's OK.
 - Pending: record judges' results and feedback here.
+
+## Close of day (2026-10-17 ~23:00 Chile)
+- Organizers: 70+ projects reviewed; no demos today; winners to be announced, followed by a Demo Day on X livestream in the coming days. Public prize info: US$10,000 pool (Luma page), no per-place breakdown; 3 winners announced on Discord.
+- Leaderboard landscape (public API, read-only): 136 projects total; 56 CreateOS projects created Oct 17-18 UTC, 42 under `stripe-eindhoven-2026` (code from the organizers' later update; 45 entries in that filter), 10 under `createos-2026`, 4 without a code. KISS is listed as `setup` under `createos-2026`; Cristóbal may confirm with organizers that this code is counted.
+- Loopback dashboard stopped (no active run). Local commits `63aa902`, `8655ec9` and this one are not pushed; push only with Cristóbal's OK.
