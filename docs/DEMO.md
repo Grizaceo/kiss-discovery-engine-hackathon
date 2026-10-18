@@ -116,7 +116,7 @@ uv run kiss audit
 ## 4. Two submission channels & permission gates
 
 **Deadline:** Sat 2026-10-17 17:30 PT = 21:30 Chile (organizer announcement). **Demos:** 18:00 PT = 22:00 Chile on Discord.
-**Hackathon code:** `CreateOS-2026` (internal slug on leaderboard filter: `createos-2026`).
+**Hackathon code:** `CreateOS-2026` (internal slug on leaderboard filter: `createos-2026`). The accepted entry is stored as `createos-2026`; the projects.dev repo validator also requires `.projects/state.json` and `.projects/state.local.json` in the public repo.
 
 ### Channel A: Stripe Projects Leaderboard (`https://projects.dev/leaderboard`)
 Verified by inspecting the live page and client bundle (`SubmitProjectModal`):
@@ -131,7 +131,7 @@ Verified by inspecting the live page and client bundle (`SubmitProjectModal`):
 | `Public Repo URL` | `https://github.com/Grizaceo/kiss-discovery-engine-hackathon` (validated by `POST /api/validate-repo`, which pulls name + description from GitHub) | Live (`PUBLIC`, anonymous HTTP 200) |
 | `Deployed Project URL` | `https://grizaceo.github.io/kiss-discovery-engine-hackathon/evidence/` (serves static, zero-JS `evidence/index.html`; **never** expose `kiss serve` or any execution endpoint) | Live (HTTP 200) |
 | `Stack URL` | `https://projects.dev/s#v1:createos~project` | Ready |
-| `Hackathon code` | `CreateOS-2026` (filter slug: `createos-2026`) | Ready |
+| `Hackathon code` | `CreateOS-2026` (filter slug: `createos-2026`) | Submitted; listed under `createos-2026` |
 
 ### Channel B: official Google Form (one submission per team, sent by the team leader)
 - URL: https://docs.google.com/forms/d/e/1FAIpQLSePC6jPY0H58XTw9LJQZLtGH4Ij8uFwzwkA_7oUYpZaTWkDLQ/viewform

@@ -1,6 +1,11 @@
 # State
 Created 2026-10-17T16:26:36.417691-03:00; updated during final verification on 2026-10-17.
 
+## Discord presentation explanation (2026-10-17)
+- Reviewed local README, demo guide and implementation references to prepare a plain-Spanish explanation: fixed counting task, model proposals, trusted tests, actual paused-VM forks, code/VM ancestry and measured-results caveats.
+- Documentation-only assistance; no generated code executed, no live runs, provider calls, publication or resource mutations.
+- Follow-up competition review: public `GET /api/leaderboard?hackathon=createos-2026` returned 10 entries including KISS under display name `setup` (matching repository/evidence URLs). Read all nine competitors' public README files via GitHub API; comparison is a presentation/documentation assessment, not independent runtime verification or an official judging forecast. No votes, submissions, remote executions or external mutations performed.
+
 ## Done
 - Empty-directory event implementation; explicit provenance; uv lockfile; existing Stripe Projects stack reused.
 - Official SDK adapter, direct Mercury generator, remote harness, bounded search, selection/deduplication, own-parent revisions, separate code/VM lineage, events/report and loopback UI.
@@ -66,3 +71,11 @@ Last verified: 2026-10-17T20:14-03:00 (pre-publish Block A: ruff format/check cl
 - `/report/<run_id>` now renders from the atomic `summary.json` checkpoint, so the report link works mid-run (`LIVE RUN IN PROGRESS`) instead of a 404 JSON before `report.html` exists.
 - New `tests/test_dashboard_e2e.py` + `tests/e2e/dashboard_e2e.mjs`: real headless Chromium (CDP, real mouse clicks) against an offline fixture server in a temp dir with faked `Popen` (no real run): 52 checks incl. panes open through live updates, scroll, report links/tabs, outage/recovery, launch/409/validation, no JS errors. Fails on the previous code (11 checks: panes closing, live report 404), passes on the fix. 94 tests total.
 - Real dashboard restarted on 127.0.0.1:8097 with the fix; read-only browser check against real `runs/`: 7 runs, 8 panes stay open after 3 refresh cycles, 7/7 reports 200, no JS errors; launch button never clicked.
+
+## Submission and live demo run (Block D, final, 2026-10-17 ~21:07-22:26 Chile)
+- Single real run, launched with the dashboard button during the recording: `search-20261018T000754-1e3413` (00:07:54 → 00:10:45 UTC, stop `max_rounds`, 3 Mercury calls, 4/4 destroyed). `g0-c0` sorted-bisect 60/60, 0.99× parity; `g0-c1` two-pointer 60/60, 0.80× faster beyond the noise band (`agreement: true`), best; `g1-c0` revision of `g0-c1` 60/60, 1.00× parity, not selected; its VM was forked from `g0-c1`'s paused VM.
+- Read-only audit `audit-20261018T002949-a46178`: 38/38 owned sandboxes destroyed, `unresolved: []`, 24,092 provider-reported tokens across 19 usage events.
+- Leaderboard submitted by Cristóbal and read back under `createos-2026` (display name `setup`, from the Stripe project name). The repo validator required `.projects/state.json` (`d02de74`) and `.projects/state.local.json` (`acc756e`, published with Cristóbal's explicit approval: merchant/project/resource IDs, no keys); `vault/`, `cache/`, `.env` and `runs/` stay ignored.
+- Video `demo-final-with-face.mp4` (2:30, 1080p): screen recording + TTS voiceover + Cristóbal's phone face as a picture-in-picture in the empty right margin. Ten frames reviewed: no secrets on screen, narration matches the run data. Google Form and X post submitted by Cristóbal.
+- Not pushed: `63aa902` (not authored by Devin; mentions a university Drive domain) and this commit; push only with Cristóbal's OK.
+- Pending: record judges' results and feedback here.
