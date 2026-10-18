@@ -17,6 +17,7 @@ credentials*
 !.env.example
 
 # All local Stripe project metadata stays private, except the public stack descriptor
-# (.projects/state.json) required by the projects.dev leaderboard.
+# and project identification files (.projects/state.json, state.local.json) required by the projects.dev leaderboard.
 .projects/*
 !.projects/state.json
+!.projects/state.local.json
